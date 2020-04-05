@@ -1,3 +1,4 @@
+//커밋테스트입니다
 package com.example.androidterm2020;
 
 import androidx.appcompat.app.AppCompatActivity;
