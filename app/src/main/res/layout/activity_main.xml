@@ -8,10 +8,11 @@
     <CalendarView
         android:id="@+id/calendar"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:gravity="center" />
+        android:layout_height="wrap_content"
+        android:gravity="center" >
 
     </CalendarView>
+
     <Button
         android:id="@+id/tempB"
         android:layout_width="match_parent"
