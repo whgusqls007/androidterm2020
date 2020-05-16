@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DBHelper extends SQLiteOpenHelper {
-    public static String DB_NAME = "test.db"; // 임시 테스트용 db이고 추후 최종단계에서 이름변경예정.
+    public static String DB_NAME = "test1.db"; // 임시 테스트용 db이고 추후 최종단계에서 이름변경예정.
     public static int VERSION = 1;
     public static String TB_NAME = "temp_tb"; // 임시 테스트용 테이블 이름이고 추후 최종단계에서 이름변경예정.
 

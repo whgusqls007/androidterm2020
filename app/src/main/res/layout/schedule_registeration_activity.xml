@@ -17,7 +17,7 @@
             android:text="제목" />
 
         <EditText
-            android:id="@+id/title"
+            android:id="@+id/editTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
@@ -39,7 +39,7 @@
             android:text="일정" />
 
         <EditText
-            android:id="@+id/scheduleStrDate"
+            android:id="@+id/editScheduleStrDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
@@ -48,13 +48,13 @@
             android:text="" />
 
         <EditText
-            android:id="@+id/scheduleEndDate"
+            android:id="@+id/editScheduleEndDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Name" />
+            android:text="" />
 
         <Button
             android:id="@+id/aa"
@@ -80,13 +80,13 @@
             android:text="시간" />
 
         <EditText
-            android:id="@+id/editText5"
+            android:id="@+id/editTime"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Name" />
+            android:text="" />
     </LinearLayout>
 
     <LinearLayout
@@ -102,13 +102,13 @@
             android:text="세부내용" />
 
         <EditText
-            android:id="@+id/editText6"
+            android:id="@+id/editDetails"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Name" />
+            android:text="" />
     </LinearLayout>
 
     <LinearLayout
@@ -147,7 +147,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/registrationBtn"
+        android:id="@+id/regBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"

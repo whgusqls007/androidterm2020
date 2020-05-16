@@ -19,13 +19,13 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     EditText scheduleStrDate;
     EditText scheduleEndDate;
     EditText schedule_time;
-    EditText detail;
-    int period;
+    EditText details;
+    int period = 1; // 나중에 checkbox와 연동되도록 코드를 추가해주자.
     TextView testLog;
 
     DBHelper dbHelper;
     SQLiteDatabase database;
-    String dbName = "test.db";
+    String dbName = "test1.db";
     String tableName = "test_tb";
 
     @SuppressLint("SetTextI18n")
@@ -38,10 +38,24 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         int year1 = intent.getIntExtra("Y", 0);
         int month1 = intent.getIntExtra("M", 0);
         int date1 = intent.getIntExtra("D", 0);
-        TextView textView = (TextView) findViewById(R.id.scheduleStrDate);
-        TextView textView2 = (TextView) findViewById(R.id.scheduleEndDate);
-        textView.setText(year1 + "/" + (month1 + 1) + "/" + date1);
-        textView2.setText(year1 + "/" + (month1 + 1) + "/" + date1);
+        TextView textView = (TextView) findViewById(R.id.editScheduleStrDate);
+        TextView textView2 = (TextView) findViewById(R.id.editScheduleEndDate);
+
+        if (month1 >= 9) {
+            textView.setText(year1 + "-" + (month1 + 1) + "-" + date1);
+            textView2.setText(year1 + "-" + (month1 + 1) + "-" + date1);
+        }
+        else {
+            textView.setText(year1 + "-" + "0" + (month1 + 1) + "-" + date1);
+            textView2.setText(year1 + "-" + "0" + (month1 + 1) + "-" + date1);
+        }
+
+        title = (EditText) findViewById(R.id.editTitle);
+        scheduleStrDate = (EditText) findViewById(R.id.editScheduleStrDate);
+        scheduleEndDate = (EditText) findViewById(R.id.editScheduleEndDate);
+        schedule_time = (EditText) findViewById(R.id.editTime);
+        details = (EditText) findViewById(R.id.editDetails);
+        testLog = (TextView) findViewById(R.id.logTxt);
         Button button = (Button) findViewById(R.id.aa);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,14 +65,26 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             }
         });
 
-        Button registrationBtn = (Button) findViewById(R.id.registrationBtn);
+        Button registrationBtn = (Button) findViewById(R.id.regBtn);
         registrationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 나중에 메인으로 돌아가능 기능도 추가해야함. 테스트용으로 일단 작성.
                 // DB도 일단 텍스트 테이터 등록하는 것만 일단 구현. 추후 체크박스와 연동해서 데이터가 설정되도록 변경예정.
+                println("등록시도");
                 createDatabase();
                 createTable(tableName);
+                insertRecord(); // 문제의 코드.
+            }
+        });
+
+        Button selectBtn = (Button) findViewById(R.id.selectBtn);
+        selectBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    // 입력한 데이터 출력해준다.
+                    println("출력시도");
+                    selectQuery(); // 문제의 코드.
             }
         });
     }
@@ -70,26 +96,40 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             int year2 = data.getIntExtra("Y2", 0);
             int month2 = data.getIntExtra("M2", 0);
             int date2 = data.getIntExtra("D2", 0);
-            TextView textView = (TextView)findViewById(R.id.editText4);
-            textView.setText(year2 + "/" + (month2 + 1) + "/" + date2);
+            TextView textView = (TextView)findViewById(R.id.editScheduleEndDate);
+            if(month2 >= 9) {
+                textView.setText(year2 + "-" + (month2 + 1) + "-" + date2);
+            }
+            else {
+                textView.setText(year2 + "-" + "0" + (month2 + 1) + "-" + date2);
+            }
         }
     }
 
-    public void executeQuery() {
-        println("executeQuery 호출됨.");
+    public void selectQuery() {
+        println("selectQuery 호출됨.");
 
-        Cursor cursor = database.rawQuery("select * from emp", null);
+        Cursor cursor = database.rawQuery("select * from " + tableName, null);
         int recordCount = cursor.getCount();
         println("레코드 개수: " + recordCount);
 
         for(int i = 0; i < recordCount; ++i) {
             cursor.moveToNext();
-            int id = cursor.getInt(0);
-            String name = cursor.getString(1);
-            int age = cursor.getInt(2);
-            String mobile = cursor.getString(3);
 
-            println("레코드#" + i + " : " + id + ", " + name + ", " + age + ", " + mobile);
+            String title = cursor.getString(0);
+            String scheduleStrDate = cursor.getString(1);
+            String scheduleEndDate = cursor.getString(2);
+            String schedule_time = cursor.getString(3);
+            String detail = cursor.getString(4);
+            int period = cursor.getInt(5);
+
+            println("레코드#" + i + " : "
+                    + title + ", "
+                    + scheduleStrDate + ", "
+                    + scheduleEndDate + ", "
+                    + schedule_time + ", "
+                    + detail + ", "
+                    + period);
         }
         cursor.close();
     }
@@ -116,8 +156,8 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
                 + " str_date date, "
                 + " end_date date, "
                 + " schedule_time time, "
-                + " detail text, "
-                + " period integer)");
+                + " details text, "
+                + " sch_period integer)");
 
         println("테이블 생성함: " + name);
     }
@@ -135,10 +175,18 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             return;
         }
 
-        database.execSQL("insert into " + tableName
-                + "(name, age, mobile) "
+        String sql = "insert into " + tableName
+                + " (title, str_date, end_date, schedule_time,  details, sch_period) "
                 + " values "
-                + "('John', 20, '010-1000-1000')");
+                + "(" + "'" + title.getText().toString() + "'" + ", "
+                + "'" + scheduleStrDate.getText().toString() + "'" + ", "
+                + "'" + scheduleEndDate.getText().toString() + "'" + ", "
+                + "'" + schedule_time.getText().toString() + "'" + ", "
+                + "'" + details.getText().toString() + "'" + ", "
+                + period + ")";
+
+
+        database.execSQL(sql);
 
         println("레코드 추가함.");
     }
