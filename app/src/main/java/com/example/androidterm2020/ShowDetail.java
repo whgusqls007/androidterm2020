@@ -1,6 +1,8 @@
 package com.example.androidterm2020;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -8,6 +10,10 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 public class ShowDetail extends AppCompatActivity {
+    DBHelper dbHelper;
+    SQLiteDatabase database;
+    String dbName = "test2.db";
+    String tableName = "test_tb";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +53,7 @@ public class ShowDetail extends AppCompatActivity {
         buttonsParam.leftMargin = 10;
         buttonsParam.rightMargin = 10;
 
+        // 버튼들을 만든다.
         for(int i=0; i<20; ++i) {
             scheduleSet[i] = new LinearLayout(this);
             buttons[i] = new Button(this);

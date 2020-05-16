@@ -12,7 +12,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.text.SimpleDateFormat;
 import java.time.Year;
+import java.util.Date;
 
 public class ScheduleRegistrationActivity extends AppCompatActivity {
     EditText title;
@@ -25,7 +28,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
     DBHelper dbHelper;
     SQLiteDatabase database;
-    String dbName = "test1.db";
+    String dbName = "test2.db";
     String tableName = "test_tb";
 
     @SuppressLint("SetTextI18n")
@@ -34,6 +37,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.schedule_registeration_activity);
 
+        // 달력에서 날짜 누르고 여기 올때 자동으로 날짜 + 시간을 추가해주는 기능.
         Intent intent = getIntent();
         int year1 = intent.getIntExtra("Y", 0);
         int month1 = intent.getIntExtra("M", 0);
@@ -41,21 +45,23 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         TextView textView = (TextView) findViewById(R.id.editScheduleStrDate);
         TextView textView2 = (TextView) findViewById(R.id.editScheduleEndDate);
 
+        // 1~9월과 10월 이상의 1자리 2자리 구분을 하기 위함.
         if (month1 >= 9) {
-            textView.setText(year1 + "-" + (month1 + 1) + "-" + date1);
-            textView2.setText(year1 + "-" + (month1 + 1) + "-" + date1);
+            textView.setText(year1 + "-" + (month1 + 1) + "-" + date1 + ' ' + getCurrentTime());
+            textView2.setText(year1 + "-" + (month1 + 1) + "-" + date1 + ' ' + getCurrentTime());
         }
         else {
-            textView.setText(year1 + "-" + "0" + (month1 + 1) + "-" + date1);
-            textView2.setText(year1 + "-" + "0" + (month1 + 1) + "-" + date1);
+            textView.setText(year1 + "-" + "0" + (month1 + 1) + "-" + date1 + ' ' + getCurrentTime());
+            textView2.setText(year1 + "-" + "0" + (month1 + 1) + "-" + date1 + ' ' + getCurrentTime());
         }
 
+        // 입력장소들을 각각의 대응하는 id로 mapping함.
         title = (EditText) findViewById(R.id.editTitle);
         scheduleStrDate = (EditText) findViewById(R.id.editScheduleStrDate);
         scheduleEndDate = (EditText) findViewById(R.id.editScheduleEndDate);
-        schedule_time = (EditText) findViewById(R.id.editTime);
         details = (EditText) findViewById(R.id.editDetails);
-        testLog = (TextView) findViewById(R.id.logTxt);
+        testLog = (TextView) findViewById(R.id.logTxt); // 임시로 이용하는 로그 비슷한 기능담당할 놈.
+
         Button button = (Button) findViewById(R.id.aa);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,12 +75,16 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         registrationBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 나중에 메인으로 돌아가능 기능도 추가해야함. 테스트용으로 일단 작성.
+                // 나중에 메인으로 돌아가도록 기능도 추가해야함. 테스트용으로 일단 작성.
                 // DB도 일단 텍스트 테이터 등록하는 것만 일단 구현. 추후 체크박스와 연동해서 데이터가 설정되도록 변경예정.
                 println("등록시도");
+
+                // 여기는 만들려는게 이미 있으면 아무일 없다.
                 createDatabase();
                 createTable(tableName);
-                insertRecord(); // 문제의 코드.
+
+                // 데이터를 추가함.
+                insertRecord();
             }
         });
 
@@ -84,9 +94,18 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             public void onClick(View v) {
                     // 입력한 데이터 출력해준다.
                     println("출력시도");
-                    selectQuery(); // 문제의 코드.
+                    selectQuery();
             }
         });
+    }
+
+    private String getCurrentTime() {
+        long now = System.currentTimeMillis(); // 현재시간 가져옴.
+        Date mDate = new Date(now); // Date 타입으로 바꿈.
+        SimpleDateFormat simpleDate = new SimpleDateFormat("hh:mm"); // yyyy-MM-dd hh:mm:ss가 datetime 타입에 딱 알맞다.
+        String getTime = simpleDate.format(mDate);
+
+        return getTime;
     }
 
     @Override
@@ -98,14 +117,15 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             int date2 = data.getIntExtra("D2", 0);
             TextView textView = (TextView)findViewById(R.id.editScheduleEndDate);
             if(month2 >= 9) {
-                textView.setText(year2 + "-" + (month2 + 1) + "-" + date2);
+                textView.setText(year2 + "-" + (month2 + 1) + "-" + date2 + ' ' + getCurrentTime());
             }
             else {
-                textView.setText(year2 + "-" + "0" + (month2 + 1) + "-" + date2);
+                textView.setText(year2 + "-" + "0" + (month2 + 1) + "-" + date2 + ' ' + getCurrentTime());
             }
         }
     }
 
+    // sql상에서 select한거 출력시키는 함수.
     public void selectQuery() {
         println("selectQuery 호출됨.");
 
@@ -116,10 +136,10 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         for(int i = 0; i < recordCount; ++i) {
             cursor.moveToNext();
 
-            String title = cursor.getString(0);
-            String scheduleStrDate = cursor.getString(1);
-            String scheduleEndDate = cursor.getString(2);
-            String schedule_time = cursor.getString(3);
+            int id = cursor.getInt(0);
+            String title = cursor.getString(1);
+            String scheduleStrDate = cursor.getString(2);
+            String scheduleEndDate = cursor.getString(3);
             String detail = cursor.getString(4);
             int period = cursor.getInt(5);
 
@@ -127,13 +147,13 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
                     + title + ", "
                     + scheduleStrDate + ", "
                     + scheduleEndDate + ", "
-                    + schedule_time + ", "
                     + detail + ", "
                     + period);
         }
         cursor.close();
     }
 
+    // 데이터베이스를 만들거나 이미 있다면 가져오는 함수.
     private void createDatabase() {
         println("createDatabase 호출됨.");
 
@@ -142,6 +162,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         println("데이터베이스 생성함: " + dbName);
     }
 
+    // 테이블을 만드는 함수 이미 있다면 만들지 않는다.
     private void createTable(String name) {
         println("createTable 호출됨.");
 
@@ -153,15 +174,16 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         database.execSQL("create table if not exists " + name + "("
                 + "_id integer PRIMARY KEY autoincrement, "
                 + " title text, "
-                + " str_date date, "
-                + " end_date date, "
-                + " schedule_time time, "
+                + " str_date datetime, "
+                + " end_date datetime, "
                 + " details text, "
                 + " sch_period integer)");
 
         println("테이블 생성함: " + name);
     }
 
+
+    // 테이블에 데이터를 추가함.
     private void insertRecord() {
         println("insertRecord 호출됨.");
 
@@ -176,12 +198,11 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         }
 
         String sql = "insert into " + tableName
-                + " (title, str_date, end_date, schedule_time,  details, sch_period) "
+                + " (title, str_date, end_date, details, sch_period) "
                 + " values "
                 + "(" + "'" + title.getText().toString() + "'" + ", "
-                + "'" + scheduleStrDate.getText().toString() + "'" + ", "
-                + "'" + scheduleEndDate.getText().toString() + "'" + ", "
-                + "'" + schedule_time.getText().toString() + "'" + ", "
+                + "'" + scheduleStrDate.getText().toString() + ":00" + "'" + ", "
+                + "'" + scheduleEndDate.getText().toString() + ":00" + "'" + ", "
                 + "'" + details.getText().toString() + "'" + ", "
                 + period + ")";
 
@@ -191,6 +212,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         println("레코드 추가함.");
     }
 
+    // 임시화면에 보여주는 용도.
     public void println(String data) {
         testLog.append(data + "\n");
     }
