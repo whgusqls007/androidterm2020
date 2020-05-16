@@ -75,13 +75,13 @@ public class MainActivity extends AppCompatActivity {
                 Button button2 = (Button) findViewById(R.id.side);
                 switch (position){
                     case 0 :
-                        button2.setTextColor(Color.rgb(0x00,0xFF, 0x00));
+                        button2.setBackgroundColor(Color.rgb(0x00,0xFF, 0x00));
                         break;
                     case 1 :
-                        button2.setTextColor(Color.rgb(0xFF,0x00, 0x00));
+                        button2.setBackgroundColor(Color.rgb(0xFF,0x00, 0x00));
                         break;
                     case 2 :
-                        button2.setTextColor(Color.rgb(0x00,0x00, 0xFF));
+                        button2.setBackgroundColor(Color.rgb(0x00,0x00, 0xFF));
                         break;
                 }
 
