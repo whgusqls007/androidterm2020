@@ -17,13 +17,13 @@
             android:text="제목" />
 
         <EditText
-            android:id="@+id/editText2"
+            android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Name" />
+            android:text="" />
     </LinearLayout>
 
     <LinearLayout
@@ -39,7 +39,16 @@
             android:text="일정" />
 
         <EditText
-            android:id="@+id/editText3"
+            android:id="@+id/scheduleStrDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="" />
+
+        <EditText
+            android:id="@+id/scheduleEndDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
@@ -47,14 +56,6 @@
             android:inputType="textPersonName"
             android:text="Name" />
 
-        <EditText
-            android:id="@+id/editText4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Name" />
         <Button
             android:id="@+id/aa"
             android:layout_width="0dp"
@@ -146,10 +147,38 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/button7"
+        android:id="@+id/registrationBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:text="Button" />
+        android:text="일정등록" />
+
+    <Button
+        android:id="@+id/selectBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="등록된 데이터 조회" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="테스트용" />
+
+            <TextView
+                android:id="@+id/logTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
