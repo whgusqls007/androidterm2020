@@ -1,21 +1,15 @@
-//커밋테스트입니다
-//클론테스트입니다
 package com.example.androidterm2020;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
-import android.widget.DatePicker;
 
 public class MainActivity extends AppCompatActivity {
-    @Override
-
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -40,16 +34,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent2);
             }
         });
+        Button button1 = (Button) findViewById(R.id.tempB1);
+        button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent3 = new Intent(getApplicationContext(), Achieve.class);
+                startActivity(intent3);
+            }
+        });
 
     }
 
 }
-        /*Button button = (Button) findViewById(R.id.nextActivity);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
-                //intent.putExtra("message", "반갑습니다.");
-                startActivity(intent);
-            }
-        });*/
