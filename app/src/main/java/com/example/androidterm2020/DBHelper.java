@@ -1,15 +1,16 @@
 package com.example.androidterm2020;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class DBHelper extends SQLiteOpenHelper {
-    public static String DB_NAME = "test2.db"; // 임시 테스트용 db이고 추후 최종단계에서 이름변경예정.
+    public static String DB_NAME = "test3.db"; // 임시 테스트용 db이고 추후 최종단계에서 이름변경예정.
     public static int VERSION = 1;
     public static String TB_NAME = "temp_tb"; // 임시 테스트용 테이블 이름이고 추후 최종단계에서 이름변경예정.
 
-    public DBHelper(TableTool context) {
+    public DBHelper(Context context) {
         super(context, DB_NAME, null, VERSION);
     }
 
