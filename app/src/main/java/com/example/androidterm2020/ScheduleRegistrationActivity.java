@@ -31,7 +31,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     String dbName = "test2.db";
     String tableName = "test_tb";
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "CutPasteId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,9 +103,8 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         long now = System.currentTimeMillis(); // 현재시간 가져옴.
         Date mDate = new Date(now); // Date 타입으로 바꿈.
         SimpleDateFormat simpleDate = new SimpleDateFormat("hh:mm"); // yyyy-MM-dd hh:mm:ss가 datetime 타입에 딱 알맞다.
-        String getTime = simpleDate.format(mDate);
 
-        return getTime;
+        return simpleDate.format(mDate);
     }
 
     @Override
