@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final String[] items = {"전체 일정", "날씨 확인", "환경 설정"};
+        final String[] items = {"전체 일정", "환경 설정"};
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, items);
 
         listView = (ListView)findViewById(R.id.drawer_menu);
@@ -126,12 +126,10 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView parent, View v, int position, long id){
                 switch (position){
                     case 0 :
-
+                        Intent intent = new Intent(getApplicationContext(), ShowAllSchedule.class);
+                        startActivity(intent);
                         break;
                     case 1 :
-
-                        break;
-                    case 2 :
 
                         break;
                 }
