@@ -1,8 +1,10 @@
 package com.example.androidterm2020;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -19,6 +21,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -35,6 +38,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     ListView listView = null;
+    Toolbar myToolbar;
     private GpsTracker gpsTracker;
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -75,6 +79,13 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
             }
         });
+
+        myToolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);//기본버튼추가
+        actionBar.setHomeAsUpIndicator(R.drawable.menu);//이미지 바꾸기, drawable에 이미지 추가 필요
+
         CalendarView calendar = (CalendarView)findViewById(R.id.calendar);
         calendar.setWeekSeparatorLineColor(Color.BLACK);
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -103,19 +114,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent3);
             }
         });
-        Button buttonOpen = (Button)findViewById(R.id.side);
-        buttonOpen.setOnClickListener(new Button.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.drawer);
-                if(!drawerLayout.isDrawerOpen(Gravity.LEFT)){
-                    drawerLayout.openDrawer(Gravity.LEFT);
-                }
-                else{
-                    drawerLayout.closeDrawer(Gravity.LEFT);
-                }
-            }
-        });
 
         final String[] items = {"전체 일정", "날씨 확인", "환경 설정"};
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, items);
@@ -126,16 +124,15 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new ListView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView parent, View v, int position, long id){
-                Button button2 = (Button) findViewById(R.id.side);
                 switch (position){
                     case 0 :
-                        button2.setBackgroundColor(Color.rgb(0x00,0xFF, 0x00));
+
                         break;
                     case 1 :
-                        button2.setBackgroundColor(Color.rgb(0xFF,0x00, 0x00));
+
                         break;
                     case 2 :
-                        button2.setBackgroundColor(Color.rgb(0x00,0x00, 0xFF));
+
                         break;
                 }
 
@@ -145,6 +142,23 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.drawer);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if(!drawerLayout.isDrawerOpen(Gravity.LEFT)){
+                    drawerLayout.openDrawer(Gravity.LEFT);
+                }
+                else{
+                    drawerLayout.closeDrawer(Gravity.LEFT);
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     public void onRequestPermissionsResult(int permsRequestCode,
                                            @NonNull String[] permissions,
