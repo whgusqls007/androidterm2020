@@ -2,8 +2,11 @@ package com.example.androidterm2020;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -18,6 +21,12 @@ public class ShowDetail extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        final int YEAR = intent.getIntExtra("Y", 0);
+        final int MONTH = intent.getIntExtra("M", 0);
+        final int DAY_OF_MONTH = intent.getIntExtra("D", 0);
+        String date = YEAR  + "-" + (MONTH > 9 ? "" : "0") + (MONTH+1) + "-" + DAY_OF_MONTH;
 
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
@@ -53,8 +62,12 @@ public class ShowDetail extends AppCompatActivity {
         buttonsParam.leftMargin = 10;
         buttonsParam.rightMargin = 10;
 
+        Cursor cursor = getContentResolver().query(ScheduleProvider.CONTENT_URI, new String[]{DBHelper.SCHEDULE_START_DATE, DBHelper.SCHEDULE_TITLE, DBHelper.SCHEDULE_ID},
+                "date(" + DBHelper.SCHEDULE_START_DATE + ") = ?", new String[] {date}, DBHelper.SCHEDULE_ID + " ASC");
+
         // 버튼들을 만든다.
-        for(int i=0; i<20; ++i) {
+        for(int i=0; i < cursor.getCount(); ++i) {
+            cursor.moveToNext();
             scheduleSet[i] = new LinearLayout(this);
             buttons[i] = new Button(this);
             CheckBox checkBox = new CheckBox(this);
@@ -63,7 +76,7 @@ public class ShowDetail extends AppCompatActivity {
             scheduleSet[i].setOrientation(LinearLayout.HORIZONTAL); // checkbox랑 달성도로 이동하는 버튼
 
 
-            buttons[i].setText("일정 " + (i+1));
+            buttons[i].setText(date + "    " + cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_TITLE)));
             buttons[i].setLayoutParams(defaultParams1);
             buttons[i].setLayoutParams(buttonsParam);
             checkBox.setLayoutParams(checkBoxParam);
@@ -94,6 +107,26 @@ public class ShowDetail extends AppCompatActivity {
         settingButton.addView(modifyButton);
         settingButton.addView(addButton);
 
+        // checkbox 1개만 사용하는 기능 만들어야함.
+        // 수정버튼 만들어야함. intent 넘겨줄 때 이것저것 넘겨주자.
+        modifyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ;
+            }
+        });
+
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
+                intent.putExtra("Y", YEAR);
+                intent.putExtra("M", MONTH);
+                intent.putExtra("D", DAY_OF_MONTH);
+                startActivity(intent);
+            }
+        });
+        // 등록후 다시 화면을 초기화하고 다시 버튼 만들어야함.
 
 
         block1.addView(scrollView);

@@ -17,13 +17,13 @@ public class ScheduleProvider extends ContentProvider {
     private static final String BASE_PATH = "test4"; // db이름.
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH );
 
-    private static final int PERSONS = 1;
-    private static final int PERSON_ID = 2;
+    private static final int SCHEDULES = 1;
+    private static final int SCHEDULES_ID = 2;
 
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
-        uriMatcher.addURI(AUTHORITY, BASE_PATH, PERSONS);
-        uriMatcher.addURI(AUTHORITY, BASE_PATH + "/#", PERSON_ID);
+        uriMatcher.addURI(AUTHORITY, BASE_PATH, SCHEDULES);
+        uriMatcher.addURI(AUTHORITY, BASE_PATH + "/#", SCHEDULES_ID);
     }
 
     private SQLiteDatabase database;
@@ -38,13 +38,12 @@ public class ScheduleProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] strings, String s, String[] strings1, String s1) {
+    public Cursor query(Uri uri, String[] columns, String selection, String[] selectionArgs, String setOrder) {
         Cursor cursor;
         switch (uriMatcher.match(uri)) {
-            case PERSONS:
-                cursor =  database.query(DBHelper.TABLE_NAME, DBHelper.ALL_COLUMNS,
-                        s,null,null,null,DBHelper.SCHEDULE_START_DATE +" ASC");
-                //cursor =  database.rawQuery("select * from " + DBHelper.TABLE_NAME + " order by " + DBHelper.SCHEDULE_START_DATE + " ASC;", null);
+            case SCHEDULES:
+                cursor =  database.query(DBHelper.TABLE_NAME, columns,
+                        selection,selectionArgs,null,null, setOrder);
                 break;
             default:
                 throw new IllegalArgumentException("알 수 없는 URI " + uri);
@@ -58,7 +57,7 @@ public class ScheduleProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         switch (uriMatcher.match(uri)) {
-            case PERSONS:
+            case SCHEDULES:
                 return "vnd.android.cursor.dir/persons";
             default:
                 throw new IllegalArgumentException("알 수 없는 URI " + uri);
@@ -83,7 +82,7 @@ public class ScheduleProvider extends ContentProvider {
     public int delete(Uri uri, String s, String[] strings) {
         int count = 0;
         switch (uriMatcher.match(uri)) {
-            case PERSONS:
+            case SCHEDULES:
                 count =  database.delete(DBHelper.TABLE_NAME, s, strings);
                 break;
             default:
@@ -98,7 +97,7 @@ public class ScheduleProvider extends ContentProvider {
     public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
         int count = 0;
         switch (uriMatcher.match(uri)) {
-            case PERSONS:
+            case SCHEDULES:
                 count =  database.update(DBHelper.TABLE_NAME, contentValues, s, strings);
                 break;
             default:
@@ -107,5 +106,9 @@ public class ScheduleProvider extends ContentProvider {
         getContext().getContentResolver().notifyChange(uri, null);
 
         return count;
+    }
+
+    public Cursor rawQuery(String sql) {
+        return database.rawQuery(sql, null);
     }
 }

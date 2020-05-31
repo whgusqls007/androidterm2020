@@ -14,6 +14,7 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -92,7 +93,14 @@ public class MainActivity extends AppCompatActivity {
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int DayOfMonth) {
+                String date = year  + "-" + (month > 9 ? "" : "0") + (month+1) + "-" + DayOfMonth;
+                Cursor cursor = getContentResolver().query(ScheduleProvider.CONTENT_URI, DBHelper.ALL_COLUMNS, "date(" + DBHelper.SCHEDULE_START_DATE + ") = ?", new String[] {date}, DBHelper.SCHEDULE_START_DATE + " ASC");
                 Intent intent = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
+
+                if (cursor.getCount() > 0) {
+                    intent = new Intent(getApplicationContext(), ShowDetail.class);
+                }
+
                 intent.putExtra("Y", year);
                 intent.putExtra("M", month);
                 intent.putExtra("D", DayOfMonth);

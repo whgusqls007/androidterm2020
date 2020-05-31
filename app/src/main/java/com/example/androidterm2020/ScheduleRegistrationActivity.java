@@ -169,9 +169,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
     public void insertSchedule() {
         println("insertPerson 호출됨");
-
-        String uriString = "content://com.example.androidterm2020/test4";
-        Uri uri = new Uri.Builder().build().parse(uriString);
+        Uri uri = ScheduleProvider.CONTENT_URI;
 
         Cursor cursor = getContentResolver().query(uri, null, null, null, null);
         String[] columns = cursor.getColumnNames(); // 문제의 line;
@@ -205,11 +203,10 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
     public void querySchedule() {
         try {
-            String uriString = "content://com.example.androidterm2020/test4";
-            Uri uri = new Uri.Builder().build().parse(uriString);
+            Uri uri = ScheduleProvider.CONTENT_URI;
 
             String[] columns = DBHelper.ALL_COLUMNS;
-            Cursor cursor = getContentResolver().query(uri, columns, null, null, "name ASC");
+            Cursor cursor = getContentResolver().query(uri, columns, null, null, DBHelper.SCHEDULE_START_DATE + " ASC");
             println("query 결과 : " + cursor.getCount());
 
             int index = 0;
@@ -235,8 +232,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
     // 나중에 수정예정
     public void updateSchedule() {
-        String uriString = "content://com.example.androidterm2020/test4";
-        Uri uri = new Uri.Builder().build().parse(uriString);
+        Uri uri = ScheduleProvider.CONTENT_URI;
 
         String selection = "mobile = ?";
         String[] selectionArgs = new String[] {"010-1000-1000"};
@@ -249,8 +245,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
     // 나중에 수정예정, 일정 수정하러 가는 기능에서 사용예쩡.
     public void deleteSchedule() {
-        String uriString = "content://com.example.androidterm2020/test4";
-        Uri uri = new Uri.Builder().build().parse(uriString);
+        Uri uri = ScheduleProvider.CONTENT_URI;
 
         String selection = "name = ?";
         String[] selectionArgs = new String[] {"john"};
