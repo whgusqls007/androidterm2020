@@ -39,6 +39,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
     ListView listView = null;
     Toolbar myToolbar;
+    ListViewAdapter adapter;
     private GpsTracker gpsTracker;
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
@@ -115,11 +116,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final String[] items = {"전체 일정", "환경 설정"};
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, items);
+        adapter = new ListViewAdapter();
 
         listView = (ListView)findViewById(R.id.drawer_menu);
         listView.setAdapter(adapter);
+
+        //유동적으로 추가 가능
+        adapter.addItem("전체 일정");
+        adapter.addItem("환경설정");
+        adapter.addItem(ContextCompat.getDrawable(this, R.drawable.sunnny), "맑음");
 
         listView.setOnItemClickListener(new ListView.OnItemClickListener(){
             @Override
