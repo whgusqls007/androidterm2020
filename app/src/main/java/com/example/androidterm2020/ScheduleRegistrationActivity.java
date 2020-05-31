@@ -3,16 +3,20 @@ package com.example.androidterm2020;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Year;
 import java.util.Date;
@@ -23,15 +27,15 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     EditText scheduleEndDate;
     EditText schedule_time;
     EditText details;
-    int period = 1; // 나중에 checkbox와 연동되도록 코드를 추가해주자.
+    int period = 0; // 나중에 checkbox와 연동되도록 코드를 추가해주자.
     TextView testLog;
 
     DBHelper dbHelper;
     SQLiteDatabase database;
-    String dbName = "test2.db";
+    String dbName = "test4.db";
     String tableName = "test_tb";
 
-    @SuppressLint({"SetTextI18n", "CutPasteId"})
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +65,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         scheduleEndDate = (EditText) findViewById(R.id.editScheduleEndDate);
         details = (EditText) findViewById(R.id.editDetails);
         testLog = (TextView) findViewById(R.id.logTxt); // 임시로 이용하는 로그 비슷한 기능담당할 놈.
+        println("로그 창 생성완료.");
 
         Button button = (Button) findViewById(R.id.aa);
         button.setOnClickListener(new View.OnClickListener() {
@@ -79,12 +84,8 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
                 // DB도 일단 텍스트 테이터 등록하는 것만 일단 구현. 추후 체크박스와 연동해서 데이터가 설정되도록 변경예정.
                 println("등록시도");
 
-                // 여기는 만들려는게 이미 있으면 아무일 없다.
-                createDatabase();
-                createTable(tableName);
-
                 // 데이터를 추가함.
-                insertRecord();
+                insertSchedule();
             }
         });
 
@@ -94,7 +95,48 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             public void onClick(View v) {
                     // 입력한 데이터 출력해준다.
                     println("출력시도");
-                    selectQuery();
+                    querySchedule();
+            }
+        });
+
+        final CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
+        final CheckBox checkBox2 = (CheckBox) findViewById(R.id.checkBox2);
+        final CheckBox checkBox3 = (CheckBox) findViewById(R.id.checkBox3);
+
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                println("period는 0");
+                if(checkBox.isChecked() == true) {
+                    checkBox2.setChecked(false);
+                    checkBox3.setChecked(false);
+                    period = 0;
+                }
+            }
+        });
+
+
+        checkBox2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                println("period는 1");
+                if(checkBox2.isChecked() == true) {
+                    checkBox.setChecked(false);
+                    checkBox3.setChecked(false);
+                    period = 1;
+                }
+            }
+        });
+
+        checkBox3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                println("period는 2");
+                if(checkBox3.isChecked() == true) {
+                    checkBox.setChecked(false);
+                    checkBox2.setChecked(false);
+                    period = 2;
+                }
             }
         });
     }
@@ -103,8 +145,9 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         long now = System.currentTimeMillis(); // 현재시간 가져옴.
         Date mDate = new Date(now); // Date 타입으로 바꿈.
         SimpleDateFormat simpleDate = new SimpleDateFormat("hh:mm"); // yyyy-MM-dd hh:mm:ss가 datetime 타입에 딱 알맞다.
+        String getTime = simpleDate.format(mDate);
 
-        return simpleDate.format(mDate);
+        return getTime;
     }
 
     @Override
@@ -124,91 +167,115 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         }
     }
 
-    // sql상에서 select한거 출력시키는 함수.
-    public void selectQuery() {
-        println("selectQuery 호출됨.");
+    public void insertSchedule() {
+        println("insertPerson 호출됨");
 
-        Cursor cursor = database.rawQuery("select * from " + tableName, null);
-        int recordCount = cursor.getCount();
-        println("레코드 개수: " + recordCount);
+        String uriString = "content://com.example.androidterm2020/test4";
+        Uri uri = new Uri.Builder().build().parse(uriString);
 
-        for(int i = 0; i < recordCount; ++i) {
-            cursor.moveToNext();
-
-            int id = cursor.getInt(0);
-            String title = cursor.getString(1);
-            String scheduleStrDate = cursor.getString(2);
-            String scheduleEndDate = cursor.getString(3);
-            String detail = cursor.getString(4);
-            int period = cursor.getInt(5);
-
-            println("레코드#" + i + " : "
-                    + title + ", "
-                    + scheduleStrDate + ", "
-                    + scheduleEndDate + ", "
-                    + detail + ", "
-                    + period);
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        String[] columns = cursor.getColumnNames(); // 문제의 line;
+        println("columns count -> " + columns.length);
+        for (int i = 0; i < columns.length; i++) {
+            println("#" + i + " : " + columns[i]);
         }
-        cursor.close();
+
+        ContentValues values = new ContentValues();
+        String strDate = scheduleStrDate.getText().toString();
+        String endDate = scheduleEndDate.getText().toString();
+        long dateNum = calDate(strDate, endDate);
+        String data = "";
+
+        for(int i=0; i<dateNum; ++i) {
+            data += '0';
+        }
+
+        values.put(DBHelper.SCHEDULE_TITLE, title.getText().toString());
+        values.put(DBHelper.SCHEDULE_START_DATE, strDate);
+        values.put(DBHelper.SCHEDULE_END_DATE, endDate);
+        values.put(DBHelper.SCHEDULE_DETAILS, details.getText().toString());
+        values.put(DBHelper.SCHEDULE_PERIOD, period);
+        values.put(DBHelper.SCHEDULE_DATE_NUM, dateNum);
+        values.put(DBHelper.SCHEDULE_ACHIEVEMENT_INDEX, 0);
+        values.put(DBHelper.SCHEDULE_ACHIEVEMENT_DATA, data);
+
+        uri = getContentResolver().insert(uri, values); //
+        println("insert 결과 -> " + uri.toString());
     }
 
-    // 데이터베이스를 만들거나 이미 있다면 가져오는 함수.
-    private void createDatabase() {
-        println("createDatabase 호출됨.");
+    public void querySchedule() {
+        try {
+            String uriString = "content://com.example.androidterm2020/test4";
+            Uri uri = new Uri.Builder().build().parse(uriString);
 
-        dbHelper = new DBHelper(this);
-        database = dbHelper.getWritableDatabase();
-        println("데이터베이스 생성함: " + dbName);
+            String[] columns = DBHelper.ALL_COLUMNS;
+            Cursor cursor = getContentResolver().query(uri, columns, null, null, "name ASC");
+            println("query 결과 : " + cursor.getCount());
+
+            int index = 0;
+            while(cursor.moveToNext()) {
+                int id = cursor.getInt(cursor.getColumnIndex(columns[0]));
+                String title = cursor.getString(cursor.getColumnIndex(columns[1]));
+                String strDate = cursor.getString(cursor.getColumnIndex(columns[2]));
+                String endDate = cursor.getString(cursor.getColumnIndex(columns[3]));
+                String details = cursor.getString(cursor.getColumnIndex(columns[4]));
+                int period = cursor.getInt(cursor.getColumnIndex(columns[5]));
+                int dateNum = cursor.getInt(cursor.getColumnIndex(columns[6]));
+                int achIndex = cursor.getInt(cursor.getColumnIndex(columns[7]));
+                String achData = cursor.getString(cursor.getColumnIndex(columns[8]));
+
+                println("#" + index + " -> " + id + ", " + title + ", " + strDate + ", " + endDate + ", " + details + ", " + period + ", " + dateNum + ", " + achIndex + ", " + achData);
+                index += 1;
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    // 테이블을 만드는 함수 이미 있다면 만들지 않는다.
-    private void createTable(String name) {
-        println("createTable 호출됨.");
+    // 나중에 수정예정
+    public void updateSchedule() {
+        String uriString = "content://com.example.androidterm2020/test4";
+        Uri uri = new Uri.Builder().build().parse(uriString);
 
-        if (database == null) {
-            println("데이터베이스를 먼저 생성하세요.");
-            return;
-        }
+        String selection = "mobile = ?";
+        String[] selectionArgs = new String[] {"010-1000-1000"};
+        ContentValues updateValue = new ContentValues();
+        updateValue.put("mobile", "010-2000-2000");
 
-        database.execSQL("create table if not exists " + name + "("
-                + "_id integer PRIMARY KEY autoincrement, "
-                + " title text, "
-                + " str_date datetime, "
-                + " end_date datetime, "
-                + " details text, "
-                + " sch_period integer)");
-
-        println("테이블 생성함: " + name);
+        int count = getContentResolver().update(uri, updateValue, selection, selectionArgs);
+        println("update 결과 : " + count);
     }
 
+    // 나중에 수정예정, 일정 수정하러 가는 기능에서 사용예쩡.
+    public void deleteSchedule() {
+        String uriString = "content://com.example.androidterm2020/test4";
+        Uri uri = new Uri.Builder().build().parse(uriString);
 
-    // 테이블에 데이터를 추가함.
-    private void insertRecord() {
-        println("insertRecord 호출됨.");
+        String selection = "name = ?";
+        String[] selectionArgs = new String[] {"john"};
 
-        if (database == null) {
-            println("데이터베이스를 먼저 생성하세요.");
-            return;
+        int count = getContentResolver().delete(uri, selection, selectionArgs);
+        println("delete 결과 : " + count);
+    }
+
+    // 시작일부터 끝나는 날까지 날의 수를 계산하기위한 함수.
+    public long calDate(String date1, String date2) {
+        long calDateDays = -1;
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            Date BeginDate = format.parse(date1);
+            Date EndDate = format.parse(date2);
+
+            long calDate = BeginDate.getTime() - EndDate.getTime();
+
+            calDateDays = Math.abs(calDate / (24*60*60*1000));
+        }
+        catch(ParseException e) {
+            println("date 계산 예외 발생 : " + e);
         }
 
-        if (tableName == null) {
-            println("테이블을 먼저 생성하세요.");
-            return;
-        }
-
-        String sql = "insert into " + tableName
-                + " (title, str_date, end_date, details, sch_period) "
-                + " values "
-                + "(" + "'" + title.getText().toString() + "'" + ", "
-                + "'" + scheduleStrDate.getText().toString() + ":00" + "'" + ", "
-                + "'" + scheduleEndDate.getText().toString() + ":00" + "'" + ", "
-                + "'" + details.getText().toString() + "'" + ", "
-                + period + ")";
-
-
-        database.execSQL(sql);
-
-        println("레코드 추가함.");
+        return calDateDays;
     }
 
     // 임시화면에 보여주는 용도.

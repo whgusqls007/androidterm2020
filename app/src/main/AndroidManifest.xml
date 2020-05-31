@@ -2,10 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.androidterm2020">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -13,17 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ShowAllSchedule"></activity>
-
-        <service
-            android:name=".GpsTracker"
-            android:enabled="true"
-            android:exported="true" />
-
         <activity android:name=".ScheduleRegistrationActivity" />
         <activity android:name=".PickDActivity" />
-        <activity android:name=".ShowDetail" />
-        <activity android:name=".Achieve" />
+        <activity android:name=".ShowDetail"/>
+        <activity android:name=".Achieve"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,6 +20,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="com.example.androidterm2020"
+            android:name=".ScheduleProvider"
+            android:exported="true"
+            android:readPermission="com.example.androidterm2020.READ_DATABASE"
+            android:writePermission="com.example.androidterm2020.WRITE_DATABASE"/>
     </application>
-
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
