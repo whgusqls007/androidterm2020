@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.addItem("전체 일정");
         adapter.addItem("환경설정");
         adapter.addItem(ContextCompat.getDrawable(this, R.drawable.sunnny), "맑음");
+        adapter.addItem(ContextCompat.getDrawable(this, R.drawable.gasmask), "나쁨");
 
         listView.setOnItemClickListener(new ListView.OnItemClickListener(){
             @Override
