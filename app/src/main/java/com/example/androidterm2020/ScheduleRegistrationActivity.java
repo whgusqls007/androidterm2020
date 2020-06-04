@@ -14,11 +14,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Year;
 import java.util.Date;
 
 public class ScheduleRegistrationActivity extends AppCompatActivity {
@@ -30,11 +28,6 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     int period = 0; // 나중에 checkbox와 연동되도록 코드를 추가해주자.
     TextView testLog;
 
-    DBHelper dbHelper;
-    SQLiteDatabase database;
-    String dbName = "test4.db";
-    String tableName = "test_tb";
-
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,21 +36,12 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
         // 달력에서 날짜 누르고 여기 올때 자동으로 날짜 + 시간을 추가해주는 기능.
         Intent intent = getIntent();
-        int year1 = intent.getIntExtra("Y", 0);
-        int month1 = intent.getIntExtra("M", 0);
-        int date1 = intent.getIntExtra("D", 0);
+        String datetime = intent.getStringExtra("date");
         TextView textView = (TextView) findViewById(R.id.editScheduleStrDate);
         TextView textView2 = (TextView) findViewById(R.id.editScheduleEndDate);
 
-        // 1~9월과 10월 이상의 1자리 2자리 구분을 하기 위함.
-        if (month1 >= 9) {
-            textView.setText(year1 + "-" + (month1 + 1) + "-" + date1 + ' ' + getCurrentTime());
-            textView2.setText(year1 + "-" + (month1 + 1) + "-" + date1 + ' ' + getCurrentTime());
-        }
-        else {
-            textView.setText(year1 + "-" + "0" + (month1 + 1) + "-" + date1 + ' ' + getCurrentTime());
-            textView2.setText(year1 + "-" + "0" + (month1 + 1) + "-" + date1 + ' ' + getCurrentTime());
-        }
+        textView.setText(datetime +' ' + getCurrentTime());
+        textView2.setText(datetime + ' ' + getCurrentTime());
 
         // 입력장소들을 각각의 대응하는 id로 mapping함.
         title = (EditText) findViewById(R.id.editTitle);
@@ -154,16 +138,10 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 101){
-            int year2 = data.getIntExtra("Y2", 0);
-            int month2 = data.getIntExtra("M2", 0);
-            int date2 = data.getIntExtra("D2", 0);
+
+            String date = data.getStringExtra("date");
             TextView textView = (TextView)findViewById(R.id.editScheduleEndDate);
-            if(month2 >= 9) {
-                textView.setText(year2 + "-" + (month2 + 1) + "-" + date2 + ' ' + getCurrentTime());
-            }
-            else {
-                textView.setText(year2 + "-" + "0" + (month2 + 1) + "-" + date2 + ' ' + getCurrentTime());
-            }
+            textView.setText(date + ' ' + getCurrentTime());
         }
     }
 

@@ -19,9 +19,8 @@ public class PickDActivity extends AppCompatActivity {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int DayOfMonth) {
                 Intent intent2 = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
-                intent2.putExtra("Y2", year);
-                intent2.putExtra("M2", month);
-                intent2.putExtra("D2", DayOfMonth);
+                String date = year  + "-" + (month > 9 ? "" : "0") + (month+1) + "-" + (DayOfMonth > 9 ? "" : "0") + DayOfMonth;
+                intent2.putExtra("date", date);
                 setResult(ScheduleRegistrationActivity.RESULT_OK, intent2);
                 finish();
             }

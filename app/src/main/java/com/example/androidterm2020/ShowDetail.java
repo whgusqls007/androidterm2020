@@ -13,10 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 public class ShowDetail extends AppCompatActivity {
-    DBHelper dbHelper;
-    SQLiteDatabase database;
-    String dbName = "test2.db";
-    String tableName = "test_tb";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

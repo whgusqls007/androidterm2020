@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int DayOfMonth) {
-                String date = year  + "-" + (month > 9 ? "" : "0") + (month+1) + "-" + DayOfMonth;
+                String date = year  + "-" + (month > 9 ? "" : "0") + (month+1) + "-" + (DayOfMonth > 9 ? "" : "0") + DayOfMonth;
                 Cursor cursor = getContentResolver().query(ScheduleProvider.CONTENT_URI, DBHelper.ALL_COLUMNS, "date(" + DBHelper.SCHEDULE_START_DATE + ") = ?", new String[] {date}, DBHelper.SCHEDULE_START_DATE + " ASC");
                 Intent intent = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
 
@@ -101,9 +101,7 @@ public class MainActivity extends AppCompatActivity {
                     intent = new Intent(getApplicationContext(), ShowDetail.class);
                 }
 
-                intent.putExtra("Y", year);
-                intent.putExtra("M", month);
-                intent.putExtra("D", DayOfMonth);
+                intent.putExtra("date", date);
                 startActivity(intent);
             }
         });
