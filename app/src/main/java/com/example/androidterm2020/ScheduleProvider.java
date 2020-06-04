@@ -53,6 +53,7 @@ public class ScheduleProvider extends ContentProvider {
         return cursor;
     }
 
+
     @Nullable
     @Override
     public String getType(Uri uri) {

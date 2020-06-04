@@ -23,7 +23,6 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     EditText title;
     EditText scheduleStrDate;
     EditText scheduleEndDate;
-    EditText schedule_time;
     EditText details;
     int period = 0; // 나중에 checkbox와 연동되도록 코드를 추가해주자.
     TextView testLog;
@@ -70,6 +69,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
                 // 데이터를 추가함.
                 insertSchedule();
+                finish();
             }
         });
 
