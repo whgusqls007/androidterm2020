@@ -1,7 +1,10 @@
 package com.example.androidterm2020;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -39,19 +42,29 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
         details = (EditText) findViewById(R.id.editDetails);
         testLog = (TextView) findViewById(R.id.logTxt); // 임시로 이용하는 로그 비슷한 기능담당할 놈.
 
+        final CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
+        final CheckBox checkBox2 = (CheckBox) findViewById(R.id.checkBox2);
+        final CheckBox checkBox3 = (CheckBox) findViewById(R.id.checkBox3);
+
+        // 값이 있으면 기존의 값을 입력해즌다.
         if (cursor.getCount() > 0) {
             cursor.moveToNext();
             title.setText(cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_TITLE)));
             scheduleStrDate.setText((cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_START_DATE))));
             scheduleEndDate.setText(cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_END_DATE)));
-            //details.setText(cursor.getString());
+            details.setText(cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_DETAILS)));
+            period = cursor.getInt(cursor.getColumnIndex(DBHelper.SCHEDULE_PERIOD));
+
+            if (period == 0) {
+                checkBox.setChecked(true);
+            }
+            else if (period == 1) {
+                checkBox2.setChecked(true);
+            }
+            else {
+                checkBox3.setChecked(true);
+            }
         }
-
-        //title.setText();
-
-        final CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
-        final CheckBox checkBox2 = (CheckBox) findViewById(R.id.checkBox2);
-        final CheckBox checkBox3 = (CheckBox) findViewById(R.id.checkBox3);
 
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,5 +99,29 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
                 }
             }
         });
+
+        Button updateBtn = (Button) findViewById(R.id.regBtn);
+        updateBtn.setOnClickListener(new View.OnClickListener() { // update버튼.
+            @Override
+            public void onClick(View v) {
+                // 업데이트 쿼리문.
+                updateSchedule(ID);
+                finish();
+            }
+        });
+    }
+
+    public void updateSchedule(final int ID) {
+        Uri uri = ScheduleProvider.CONTENT_URI;
+
+        String selection = DBHelper.SCHEDULE_ID + " = " + ID;
+        ContentValues updateValue = new ContentValues();
+        updateValue.put(DBHelper.SCHEDULE_TITLE, title.getText().toString());
+        updateValue.put(DBHelper.SCHEDULE_START_DATE, scheduleStrDate.getText().toString());
+        updateValue.put(DBHelper.SCHEDULE_END_DATE, scheduleEndDate.getText().toString());
+        updateValue.put(DBHelper.SCHEDULE_DETAILS, details.getText().toString());
+        updateValue.put(DBHelper.SCHEDULE_PERIOD, period);
+
+        int count = getContentResolver().update(uri, updateValue, selection, null);
     }
 }

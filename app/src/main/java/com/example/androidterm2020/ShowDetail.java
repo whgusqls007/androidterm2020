@@ -94,7 +94,7 @@ public class ShowDetail extends AppCompatActivity {
         settingButton.addView(deleteButton);
 
         // checkbox 1개만 사용하는 기능 만들어야함.
-        // 수정버튼 만들어야함. intent 넘겨줄 때 이것저것 넘겨주자.
+        // 수정버튼 만들어야함. intent 넘겨줄 때 이것저것 넘겨주자.  checkbox 1개만 check되어있는지 확인해주기.
         modifyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,9 +130,9 @@ public class ShowDetail extends AppCompatActivity {
 
                     Intent intent = new Intent(getApplicationContext(), ScheduleUpdateActivity.class);
                     intent.putExtra("ID", ID);
-                    startActivity(intent);
-                }
+                    startActivityForResult(intent, 200);
 
+                }
             }
         });
 
@@ -143,17 +143,39 @@ public class ShowDetail extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
                 intent.putExtra("date", date);
                 startActivityForResult(intent, 200);
-
             }
         });
 
+        // 여러개 지울수 있도록 개선해야함. 완료.
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteSchedule();
-                Intent intent = getIntent();
-                finish();
-                startActivity(intent);
+                String date = null;
+                String title = null;
+                int ID = 0;
+                ArrayList<Integer> indexList = new ArrayList<Integer>();
+                for(CheckBox cb: checkBoxes) {
+                    if (cb.isChecked() == true) {
+                        indexList.add(cb.getId());
+                    }
+                }
+
+                if( indexList.size() > 0 ) { // 찾았다면.
+                    for(int id : indexList) {
+                        String[] data = buttons.get(id).getText().toString().split(" ");
+                        date = data[0];
+                        title = data[1];
+                        String selection = "date(" + DBHelper.SCHEDULE_START_DATE + ") = ? and " + DBHelper.SCHEDULE_TITLE + " = ?";
+
+                        Cursor cursor = getContentResolver().query(ScheduleProvider.CONTENT_URI, new String[]{DBHelper.SCHEDULE_ID}, selection, new String[]{date, title}, DBHelper.SCHEDULE_ID + " ASC");
+                        if (cursor.getCount() > 0) {
+                            cursor.moveToNext();
+                            ID = cursor.getInt(0);
+                        }
+
+                        deleteSchedule(ID);
+                    }
+                }
             }
         });
 
@@ -190,7 +212,6 @@ public class ShowDetail extends AppCompatActivity {
                 int achIndex = cursor.getInt(cursor.getColumnIndex(columns[7]));
                 String achData = cursor.getString(cursor.getColumnIndex(columns[8]));
 
-                //println("#" + index + " -> " + id + ", " + title + ", " + strDate + ", " + endDate + ", " + details + ", " + period + ", " + dateNum + ", " + achIndex + ", " + achData);
                 index += 1;
             }
 
@@ -199,7 +220,13 @@ public class ShowDetail extends AppCompatActivity {
         }
     }
 
-    private LinearLayout createScheduleList(ArrayList<CheckBox> checkBoxes, ArrayList<Button> buttons, ArrayList<LinearLayout> scheduleSet) {
+    private void restartScreen() {
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
+
+    private LinearLayout createScheduleList(ArrayList<CheckBox> checkBoxes, final ArrayList<Button> buttons, ArrayList<LinearLayout> scheduleSet) {
         // 하나의 공간을 만듬.
         LinearLayout scheduleList = new LinearLayout(this);
         scheduleList.setOrientation(LinearLayout.VERTICAL);
@@ -223,10 +250,29 @@ public class ShowDetail extends AppCompatActivity {
             buttons.get(i).setLayoutParams(defaultParams1);
             buttons.get(i).setLayoutParams(buttonsParam);
             checkBoxes.get(i).setLayoutParams(checkBoxParam);
+            buttons.get(i).getText().toString();
 
             scheduleSet.get(i).addView(checkBoxes.get(i));
             scheduleSet.get(i).addView(buttons.get(i));
             scheduleList.addView(scheduleSet.get(i));
+
+            buttons.get(i).setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    String[] data = buttons.get(0).getText().toString().split(" ");
+                    String date = data[0];
+                    String title = data[1];
+                    int ID = 0;
+                    String selection = "date(" + DBHelper.SCHEDULE_START_DATE + ") = ? and " + DBHelper.SCHEDULE_TITLE + " = ?";
+                    Cursor cursor = getContentResolver().query(ScheduleProvider.CONTENT_URI, new String[] {DBHelper.SCHEDULE_ID}, selection, new String[] {date, title}, DBHelper.SCHEDULE_ID + " ASC");
+                    if (cursor.getCount() > 0) {
+                        cursor.moveToNext();
+                        ID = cursor.getInt(0);
+                        Intent intent = new Intent(getApplicationContext(), Achieve.class);
+                        intent.putExtra("ID", ID);
+                        startActivity(intent);
+                    }
+                }
+            });
         }
 
         return scheduleList;
@@ -242,12 +288,14 @@ public class ShowDetail extends AppCompatActivity {
         }
     }
 
-    public void deleteSchedule() {
+    private void deleteSchedule(final int ID) {
         Uri uri = ScheduleProvider.CONTENT_URI;
 
-        String selection = "date(" + DBHelper.SCHEDULE_START_DATE + ") = ?";
-        String[] selectionArgs = new String[] {date};
+        String selection = DBHelper.SCHEDULE_ID + " = " + ID;
 
-        getContentResolver().delete(uri, selection, selectionArgs);
+        int count = getContentResolver().delete(uri, selection, null);
+        if (count > 0) {
+            restartScreen();
+        }
     }
 }

@@ -173,7 +173,9 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         values.put(DBHelper.SCHEDULE_PERIOD, period);
         values.put(DBHelper.SCHEDULE_DATE_NUM, dateNum);
         values.put(DBHelper.SCHEDULE_ACHIEVEMENT_INDEX, 0);
-        values.put(DBHelper.SCHEDULE_ACHIEVEMENT_DATA, data);
+
+        // 일단 임시 데이터, 7일을 기간으로 잡고 "011100100"
+        values.put(DBHelper.SCHEDULE_ACHIEVEMENT_DATA, "011100100"); // data
 
         uri = getContentResolver().insert(uri, values); //
         println("insert 결과 -> " + uri.toString());
