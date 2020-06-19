@@ -36,6 +36,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
     ListView listView = null;
@@ -46,24 +47,41 @@ public class MainActivity extends AppCompatActivity {
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (!checkLocationServicesStatus()) {
-
             showDialogForLocationServiceSetting();
         }else {
-
             checkRunTimePermission();
         }
 
+        // gps 관련
         final TextView textview_address = (TextView)findViewById(R.id.textview);
         final EditText textview_Latitude = (EditText)findViewById(R.id.Ed1);
         final EditText textview_Longitude = (EditText)findViewById(R.id.Ed2);
+
+        gpsTracker = new GpsTracker(MainActivity.this);
+
+        final double latitude = gpsTracker.getLatitude();
+        final double longitude = gpsTracker.getLongitude();
+
+        String address = getCurrentAddress(latitude, longitude);
+        textview_address.setText(address);
+        textview_Latitude.setText(Double.toString(latitude));
+        textview_Longitude.setText(Double.toString(longitude));
+
+        Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+        GetWeatherData(latitude, longitude);
         Button ShowLocationButton = (Button) findViewById(R.id.button);
-        ShowLocationButton.setOnClickListener(new View.OnClickListener()
-        {
-            @SuppressLint("SetTextI18n")
+        ShowLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), SetAlarm.class);
+                startActivity(intent);
+            }
+            /*@SuppressLint("SetTextI18n")
             @Override
             public void onClick(View arg0)
             {
@@ -79,7 +97,8 @@ public class MainActivity extends AppCompatActivity {
                 textview_Longitude.setText(Double.toString(longitude));
 
                 Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
-            }
+                GetWeatherData(latitude, longitude);
+            }*/
         });
 
         myToolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -105,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        // 임시버튼들, 나중에 다 지워야함. xml도 수정해야함.
         Button button = (Button) findViewById(R.id.tempB);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 사이드 매뉴 담당
         adapter = new ListViewAdapter();
 
         listView = (ListView)findViewById(R.id.drawer_menu);
@@ -150,7 +172,11 @@ public class MainActivity extends AppCompatActivity {
                 drawer.closeDrawer(Gravity.LEFT);
             }
         });
-
+        // 하루가 바뀌면 해야할 것이 2가지 있다.
+        // 1. 지난날의 기록 삭제
+        // 2. 오늘의 일정을 알람 매니저에 등록. -> 다중 알람 기능.
+        // 그리고 폰을 껐다 킨 경우 해야할 것이 있다.
+        // 1. 폰을 다시 키면서 알람을 다시 등록. // 끄고나면 알람이 사라지기 때문...
     }
 
     @Override
@@ -215,6 +241,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
     void checkRunTimePermission(){
 
         //런타임 퍼미션 처리
@@ -261,14 +288,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     public String getCurrentAddress( double latitude, double longitude) {
-
         //지오코더... GPS를 주소로 변환
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-
         List<Address> addresses;
-
         try {
-
             addresses = geocoder.getFromLocation(
                     latitude,
                     longitude,
@@ -282,24 +305,18 @@ public class MainActivity extends AppCompatActivity {
             return "잘못된 GPS 좌표";
 
         }
-
-
-
         if (addresses == null || addresses.size() == 0) {
             Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
             return "주소 미발견";
 
         }
-
         Address address = addresses.get(0);
         return address.getAddressLine(0).toString()+"\n";
-
     }
 
 
     //여기부터는 GPS 활성화를 위한 메소드들
     private void showDialogForLocationServiceSetting() {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("위치 서비스 비활성화");
         builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n"
@@ -350,6 +367,25 @@ public class MainActivity extends AppCompatActivity {
 
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+
+    @SuppressLint("SetTextI18n")
+    protected void GetWeatherData(double lan, double lon){
+        String[] resultText = new String[5];
+        TextView weather = (TextView)findViewById(R.id.weather);
+        TextView weather2 = (TextView)findViewById(R.id.weather2);
+        TextView weather3 = (TextView)findViewById(R.id.weather3);
+        try{
+            resultText = new ReceiveWeatherTask(lan, lon).execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        weather.setText(resultText[0].toString());
+        weather2.setText(resultText[1].toString());
+        weather3.setText("현재온도 : " + resultText[2] + ", 최고온도 : " + resultText[4] + ", 최저온도 : " + resultText[3]);
+
     }
 
 }

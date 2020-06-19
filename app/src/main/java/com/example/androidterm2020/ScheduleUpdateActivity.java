@@ -37,8 +37,8 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
         Cursor cursor = getContentResolver().query(ScheduleProvider.CONTENT_URI, DBHelper.ALL_COLUMNS, DBHelper.SCHEDULE_ID + " = " + ID, null, null);
 
         title = (EditText) findViewById(R.id.editTitle);
-        scheduleStrDate = (EditText) findViewById(R.id.editScheduleStrDate);
-        scheduleEndDate = (EditText) findViewById(R.id.editScheduleEndDate);
+        //scheduleStrDate = (EditText) findViewById(R.id.editScheduleStrDate);
+        //scheduleEndDate = (EditText) findViewById(R.id.editScheduleEndDate);
         details = (EditText) findViewById(R.id.editDetails);
         testLog = (TextView) findViewById(R.id.logTxt); // 임시로 이용하는 로그 비슷한 기능담당할 놈.
 

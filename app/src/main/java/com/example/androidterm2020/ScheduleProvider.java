@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 public class ScheduleProvider extends ContentProvider {
 
     private static final String AUTHORITY = "com.example.androidterm2020";
-    private static final String BASE_PATH = "test4"; // db이름.
+    private static final String BASE_PATH = "sch"; // db이름.
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH );
 
     private static final int SCHEDULES = 1;

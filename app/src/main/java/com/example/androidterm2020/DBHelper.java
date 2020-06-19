@@ -5,10 +5,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "test4.db"; // 최종 단계에서 이름 수정예정.
+    private static final String DATABASE_NAME = "sch.db"; // 최종 단계에서 이름 수정예정.
     private static final int DATABASE_VERSION = 1;
 
-    public static final String TABLE_NAME = "tb1"; // 최종 단계에서 이름 수정예정.
+    public static final String TABLE_NAME = "sch_tb"; // 최종 단계에서 이름 수정예정.
 
     // 가지고 있는 column들의 이름.
     public static final String SCHEDULE_ID = "_id";
@@ -39,6 +39,10 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    public static String getDbName() {
+        return DATABASE_NAME;
     }
 
     @Override

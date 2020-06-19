@@ -160,21 +160,24 @@ public class ShowDetail extends AppCompatActivity {
                     }
                 }
 
+                // 실수로 내용 안적어도 삭제할 수 있게 함.
                 if( indexList.size() > 0 ) { // 찾았다면.
+                    ArrayList<Integer> idList = new ArrayList<Integer>();
                     for(int id : indexList) {
                         String[] data = buttons.get(id).getText().toString().split(" ");
                         date = data[0];
-                        title = data[1];
+                        title = data.length > 1 ? data[1] : null;
                         String selection = "date(" + DBHelper.SCHEDULE_START_DATE + ") = ? and " + DBHelper.SCHEDULE_TITLE + " = ?";
+                        Cursor cursor = title != null
+                                ? getContentResolver().query(ScheduleProvider.CONTENT_URI, new String[]{DBHelper.SCHEDULE_ID}, selection, new String[]{date, title}, DBHelper.SCHEDULE_ID + " ASC")
+                                : getContentResolver().query(ScheduleProvider.CONTENT_URI, new String[]{DBHelper.SCHEDULE_ID}, "date(" + DBHelper.SCHEDULE_START_DATE + ") = ? ", new String[]{date}, DBHelper.SCHEDULE_ID + " ASC");
 
-                        Cursor cursor = getContentResolver().query(ScheduleProvider.CONTENT_URI, new String[]{DBHelper.SCHEDULE_ID}, selection, new String[]{date, title}, DBHelper.SCHEDULE_ID + " ASC");
                         if (cursor.getCount() > 0) {
                             cursor.moveToNext();
-                            ID = cursor.getInt(0);
+                            idList.add(cursor.getInt(0));
                         }
-
-                        deleteSchedule(ID);
                     }
+                    deleteSchedule(idList);
                 }
             }
         });
@@ -288,13 +291,16 @@ public class ShowDetail extends AppCompatActivity {
         }
     }
 
-    private void deleteSchedule(final int ID) {
+    // 여러개 동시에 지우는 경우에도 화면은 1번만 초기화 하도록 개선해야함. 개선완료.
+    private void deleteSchedule(final ArrayList<Integer> idList) {
         Uri uri = ScheduleProvider.CONTENT_URI;
 
-        String selection = DBHelper.SCHEDULE_ID + " = " + ID;
+        for(final int ID: idList) {
+            String selection = DBHelper.SCHEDULE_ID + " = " + ID;
 
-        int count = getContentResolver().delete(uri, selection, null);
-        if (count > 0) {
+            getContentResolver().delete(uri, selection, null);
+        }
+        if (idList.size() > 0) {
             restartScreen();
         }
     }

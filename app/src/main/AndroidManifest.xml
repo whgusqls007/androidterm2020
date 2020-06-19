@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.androidterm2020">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,6 +16,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ShowAllSchedule"></activity>
+        <service
+            android:name=".GpsTracker"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver android:name=".Alarm_Receiver" />
+        <activity android:name=".SetAlarm" />
         <activity android:name=".ScheduleUpdateActivity"/>
         <activity android:name=".ScheduleRegistrationActivity" />
         <activity android:name=".PickDActivity" />
@@ -28,7 +43,4 @@
             android:readPermission="com.example.androidterm2020.READ_DATABASE"
             android:writePermission="com.example.androidterm2020.WRITE_DATABASE"/>
     </application>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.INTERNET" />
 </manifest>
