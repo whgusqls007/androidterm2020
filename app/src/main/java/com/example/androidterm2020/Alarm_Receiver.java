@@ -106,10 +106,10 @@ public class Alarm_Receiver extends BroadcastReceiver {
         remoteViews.setTextViewText(R.id.maxDegree, Weather[4]);
         remoteViews.setTextViewText(R.id.pm25, Air[0]);
         remoteViews.setTextViewText(R.id.pm10, Air[1]);
-
         builder.setAutoCancel(true)
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                 .setCustomContentView(remoteViews) // 나중에 기본형을 줄이고 여기 사용한 것을 확장형에 넣을 필요가 있다.
+                .setContentIntent(pendingI)
                 .build();
 //        builder.setAutoCancel(true)
 //                .setDefaults(NotificationCompat.DEFAULT_ALL)
@@ -197,7 +197,7 @@ public class Alarm_Receiver extends BroadcastReceiver {
                 .setTicker("{Time to watch some cool stuff!}")
                 .setSmallIcon(R.drawable.mask)
                 .setContentTitle("마스크를 착용하는 것이 권장됩니다.") // 제목
-                .setContentText("pm25 : " + Air[0] + ", pm10 : " + Air[1]) // 내용
+                .setContentText("초미세먼지 : " + Air[0] + ", 미세먼지 : " + Air[1]) // 내용
                 .setContentInfo("INFO")
                 .setContentIntent(pendingI);
 

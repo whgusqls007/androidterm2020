@@ -82,13 +82,13 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
-                    android:text="pm25"
+                    android:text="초미세먼지"
                     android:textSize="25sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="pm10"
+                    android:text="미세먼지"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
                     android:textSize="25sp"/>
