@@ -1,24 +1,34 @@
 package com.example.androidterm2020;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -48,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -153,7 +164,26 @@ public class MainActivity extends AppCompatActivity {
         adapter.addItem("전체 일정");
         adapter.addItem("환경설정");
         adapter.addItem(ContextCompat.getDrawable(this, R.drawable.sunnny), "맑음");
-        adapter.addItem(ContextCompat.getDrawable(this, R.drawable.gasmask), "나쁨");
+        //adapter.addItem(ContextCompat.getDrawable(this, R.drawable.gasmask), "나쁨");
+        //먼지에 따라 그림이 바뀐다.
+        String[] AirData = GetAirData();
+        int pm25value = Integer.parseInt(AirData[0]);
+        int pm10value = Integer.parseInt(AirData[1]);
+
+        if(pm25value <= 15 || pm10value <= 30){
+            adapter.addItem(ContextCompat.getDrawable(this, R.drawable.good), "미세먼지 없음");
+        }
+        else if((pm25value > 15 && pm25value <= 35) || (pm10value > 30 && pm10value < 80)){
+            adapter.addItem(ContextCompat.getDrawable(this, R.drawable.normal), "미세먼지 보통");
+        }
+        else if((pm25value > 35 && pm25value <= 75) || (pm10value > 80 && pm10value < 150)){
+            adapter.addItem(ContextCompat.getDrawable(this, R.drawable.gasmask), "미세먼지 나쁨");
+            MaskNotification();
+        }
+        else if((pm25value > 75) || (pm10value > 150)){
+            adapter.addItem(ContextCompat.getDrawable(this, R.drawable.skull), "미세먼지 매우 나쁨");
+            MaskNotification();
+        }
 
         listView.setOnItemClickListener(new ListView.OnItemClickListener(){
             @Override
@@ -386,6 +416,50 @@ public class MainActivity extends AppCompatActivity {
         weather2.setText(resultText[1].toString());
         weather3.setText("현재온도 : " + resultText[2] + ", 최고온도 : " + resultText[4] + ", 최저온도 : " + resultText[3]);
 
+    }
+
+    protected String[] GetAirData() {
+        String[] resultText = new String[2];
+        try {
+            resultText = new AirTask().execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return resultText;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void MaskNotification() {
+
+        Bitmap mLargeIconForNoti = BitmapFactory.decodeResource(getResources(),R.drawable.mask);
+
+        PendingIntent contentIntent = PendingIntent.getActivity(MainActivity.this, 0,
+                new Intent(getApplicationContext(),MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        NotificationManager nm = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(MainActivity.this, "CHANNEL_ID")
+                        .setSmallIcon(R.drawable.mask)
+                        .setContentTitle("마스크 챙기세요!")
+                        .setContentText("미세먼지가 심해요!")
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setLargeIcon(mLargeIconForNoti)
+                        .setAutoCancel(true)
+                        .setDefaults(Notification.DEFAULT_ALL)
+                        .setContentIntent(contentIntent);
+
+        NotificationChannel channel = new NotificationChannel("CHANNEL_ID", "name", nm.IMPORTANCE_DEFAULT);
+        channel.setDescription("description");
+        // Register the channel with the system; you can't change the importance
+        // or other notification behaviors after this
+
+        nm.createNotificationChannel(channel);
+        nm.notify(5678, builder.build());
     }
 
 }

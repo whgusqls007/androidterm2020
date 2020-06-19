@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100sp"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/weatherImg"
+            android:layout_width="100sp"
+            android:layout_height="100sp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="최저온도"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="최고온도"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textSize="25sp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/minDegree"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="최저온도 값"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textSize="25sp"/>
+                <TextView
+                    android:id="@+id/maxDegree"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text=""
+                    android:hint="최고온도 값"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textSize="25sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100sp"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/airImg"
+            android:layout_width="100sp"
+            android:layout_height="100sp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="pm25"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="pm10"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textSize="25sp"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50sp"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/pm25"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="pm25 값"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textSize="25sp"/>
+                <TextView
+                    android:id="@+id/pm10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text=""
+                    android:hint="pm10 값"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textSize="25sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

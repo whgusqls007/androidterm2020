@@ -16,10 +16,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.w3c.dom.Text;
+
+import java.text.SimpleDateFormat;
+
 public class ScheduleUpdateActivity extends AppCompatActivity {
     EditText title;
-    EditText scheduleStrDate;
-    EditText scheduleEndDate;
+    TextView scheduleStrDate;
+    TextView scheduleEndDate;
     EditText details;
     int period = 0; // 나중에 checkbox와 연동되도록 코드를 추가해주자.
     TextView testLog;
@@ -37,8 +41,8 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
         Cursor cursor = getContentResolver().query(ScheduleProvider.CONTENT_URI, DBHelper.ALL_COLUMNS, DBHelper.SCHEDULE_ID + " = " + ID, null, null);
 
         title = (EditText) findViewById(R.id.editTitle);
-        //scheduleStrDate = (EditText) findViewById(R.id.editScheduleStrDate);
-        //scheduleEndDate = (EditText) findViewById(R.id.editScheduleEndDate);
+        scheduleStrDate = (TextView) findViewById(R.id.editScheduleStrDate);
+        scheduleEndDate = (TextView) findViewById(R.id.editScheduleEndDate);
         details = (EditText) findViewById(R.id.editDetails);
         testLog = (TextView) findViewById(R.id.logTxt); // 임시로 이용하는 로그 비슷한 기능담당할 놈.
 
@@ -46,14 +50,50 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
         final CheckBox checkBox2 = (CheckBox) findViewById(R.id.checkBox2);
         final CheckBox checkBox3 = (CheckBox) findViewById(R.id.checkBox3);
 
+        scheduleStrDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerFragment timePickerFragment = new TimePickerFragment();
+
+                Bundle bundle = new Bundle();
+                // sql의 datetime에서 뒷부분인 시간을 bundle에 넣음.
+                bundle.putString("time", scheduleStrDate.getText().toString().split(" ")[1]);
+                bundle.putBoolean("is_start", true);
+                timePickerFragment.setArguments(bundle);
+                timePickerFragment.show(getSupportFragmentManager(), "TimePicker");
+            }
+        });
+
+        scheduleEndDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerFragment timePickerFragment = new TimePickerFragment();
+
+                Bundle bundle = new Bundle();
+                // sql의 datetime에서 뒷부분인 시간을 bundle에 넣음.
+                bundle.putString("time", scheduleEndDate.getText().toString().split(" ")[1]);
+                bundle.putBoolean("is_start", false);
+                timePickerFragment.setArguments(bundle);
+                timePickerFragment.show(getSupportFragmentManager(), "TimePicker");
+            }
+        });
+
+        SimpleDateFormat stringToDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); // yyyy-MM-dd hh:mm:ss가 datetime 타입에 딱 알맞다.
+        SimpleDateFormat dateToString = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         // 값이 있으면 기존의 값을 입력해즌다.
         if (cursor.getCount() > 0) {
             cursor.moveToNext();
             title.setText(cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_TITLE)));
-            scheduleStrDate.setText((cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_START_DATE))));
-            scheduleEndDate.setText(cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_END_DATE)));
             details.setText(cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_DETAILS)));
             period = cursor.getInt(cursor.getColumnIndex(DBHelper.SCHEDULE_PERIOD));
+
+            String strDate = cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_START_DATE));
+            String endDate = cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_END_DATE));
+            try {
+                scheduleStrDate.setText(dateToString.format(stringToDate.parse(strDate)));
+                scheduleEndDate.setText(dateToString.format(stringToDate.parse(endDate)));
+            }
+            catch (Exception e) {}
 
             if (period == 0) {
                 checkBox.setChecked(true);

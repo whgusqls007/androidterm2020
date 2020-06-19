@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -266,13 +267,19 @@ public class ShowDetail extends AppCompatActivity {
                     String title = data[1];
                     int ID = 0;
                     String selection = "date(" + DBHelper.SCHEDULE_START_DATE + ") = ? and " + DBHelper.SCHEDULE_TITLE + " = ?";
-                    Cursor cursor = getContentResolver().query(ScheduleProvider.CONTENT_URI, new String[] {DBHelper.SCHEDULE_ID}, selection, new String[] {date, title}, DBHelper.SCHEDULE_ID + " ASC");
+                    Cursor cursor = getContentResolver().query(ScheduleProvider.CONTENT_URI, new String[] {DBHelper.SCHEDULE_ID, DBHelper.SCHEDULE_DATE_NUM}, selection, new String[] {date, title}, DBHelper.SCHEDULE_ID + " ASC");
                     if (cursor.getCount() > 0) {
                         cursor.moveToNext();
                         ID = cursor.getInt(0);
+                        int dateNum = cursor.getInt(1);
                         Intent intent = new Intent(getApplicationContext(), Achieve.class);
                         intent.putExtra("ID", ID);
-                        startActivity(intent);
+                        if(dateNum > 0) {
+                            startActivity(intent);
+                        }
+                        else { // 안된다고 토스트 출력
+                            Toast.makeText(getApplicationContext(), "하루만 진행되는 일정은 달성도를 계산할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             });

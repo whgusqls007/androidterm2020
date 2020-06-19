@@ -19,6 +19,7 @@ public class ListViewAdapter extends BaseAdapter {
     // 아이템 데이터 리스트.
     private ArrayList<ListViewItem> listViewItemList = new ArrayList<ListViewItem>() ;
 
+    // 생성자
     public ListViewAdapter() {
 
     }
