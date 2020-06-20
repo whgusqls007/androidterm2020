@@ -48,9 +48,9 @@
                 android:layout_width="200sp"
                 android:layout_height="45sp"
                 android:gravity="center_horizontal"
+                android:hint="값이 없습니다."
                 android:text=""
-                android:textSize="22sp"
-                android:hint="값이 없습니다." />
+                android:textSize="22sp" />
 
             <TextView
                 android:id="@+id/editScheduleEndDate"
@@ -132,6 +132,11 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/testText"
+        android:text="test"/>
     <Button
         android:id="@+id/regBtn"
         android:layout_width="match_parent"

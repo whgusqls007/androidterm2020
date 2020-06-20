@@ -8,15 +8,19 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -31,22 +35,27 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     EditText title;
     TextView scheduleStrDate;
     TextView scheduleEndDate;
+    TextView test_view;
     EditText details;
     int period = -1; // 나중에 checkbox와 연동되도록 코드를 추가해주자.
     TextView testLog;
+    // 달력에서 날짜 누르고 여기 올때 자동으로 날짜 + 시간을 추가해주는 기능.
+    String start_time;
+    int start_hour, start_min;
+    int requestCode = 0;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.schedule_registeration_activity);
-
-        // 달력에서 날짜 누르고 여기 올때 자동으로 날짜 + 시간을 추가해주는 기능.
+        test_view = (TextView) findViewById(R.id.testText);
         Intent intent = getIntent();
-        String datetime = intent.getStringExtra("date");
+        final String datetime = intent.getStringExtra("date");
+        //compare_datetime = datetime.split("-");
         final TextView textView = (TextView) findViewById(R.id.editScheduleStrDate);
         final TextView textView2 = (TextView) findViewById(R.id.editScheduleEndDate);
-        textView.setText(datetime +' ' + getCurrentTime());
+        textView.setText(datetime + ' ' + getCurrentTime());
         textView2.setText(datetime + ' ' + getCurrentTime());
 
         // 입력장소들을 각각의 대응하는 id로 mapping함.
@@ -56,12 +65,11 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         details = (EditText) findViewById(R.id.editDetails);
         testLog = (TextView) findViewById(R.id.logTxt); // 임시로 이용하는 로그 비슷한 기능담당할 놈.
         println("로그 창 생성완료.");
-
+        requestCode = requestCode + 1;
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TimePickerFragment timePickerFragment = new TimePickerFragment();
-
                 Bundle bundle = new Bundle();
                 // sql의 datetime에서 뒷부분인 시간을 bundle에 넣음.
                 bundle.putString("time", textView.getText().toString().split(" ")[1]);
@@ -70,12 +78,10 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
                 timePickerFragment.show(getSupportFragmentManager(), "TimePicker");
             }
         });
-
         textView2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TimePickerFragment timePickerFragment = new TimePickerFragment();
-
                 Bundle bundle = new Bundle();
                 // sql의 datetime에서 뒷부분인 시간을 bundle에 넣음.
                 bundle.putString("time", textView2.getText().toString().split(" ")[1]);
@@ -84,12 +90,12 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
                 timePickerFragment.show(getSupportFragmentManager(), "TimePicker");
             }
         });
-
         Button button = (Button) findViewById(R.id.aa);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent2 = new Intent(getApplicationContext(), PickDActivity.class);
+                intent2.putExtra("cur_date", datetime);
                 startActivityForResult(intent2, 101);
             }
         });
@@ -101,7 +107,6 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
                 // 나중에 메인으로 돌아가도록 기능도 추가해야함. 테스트용으로 일단 작성.
                 // DB도 일단 텍스트 테이터 등록하는 것만 일단 구현. 추후 체크박스와 연동해서 데이터가 설정되도록 변경예정. -> 연동완료
                 println("등록시도");
-
                 // 데이터를 추가함.
                 String queryData = insertSchedule();
 
@@ -114,9 +119,9 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         selectBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    // 입력한 데이터 출력해준다.
-                    println("출력시도");
-                    querySchedule();
+                // 입력한 데이터 출력해준다.
+                println("출력시도");
+                querySchedule();
             }
         });
 
@@ -127,11 +132,15 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                println("period는 0");
-                if(checkBox.isChecked() == true) {
+                if (checkBox.isChecked()) {
                     checkBox2.setChecked(false);
                     checkBox3.setChecked(false);
                     period = 0;
+                    println("period는 0");
+                }
+                if(!checkBox.isChecked() && !checkBox2.isChecked() && !checkBox3.isChecked()){
+                    period = -1;
+                    println("period는 -1");
                 }
             }
         });
@@ -140,11 +149,15 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         checkBox2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                println("period는 1");
-                if(checkBox2.isChecked() == true) {
+                if (checkBox2.isChecked()) {
                     checkBox.setChecked(false);
                     checkBox3.setChecked(false);
                     period = 1;
+                    println("period는 1");
+                }
+                if(!checkBox.isChecked() && !checkBox2.isChecked() && !checkBox3.isChecked()){
+                    period = -1;
+                    println("period는 -1");
                 }
             }
         });
@@ -152,11 +165,15 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         checkBox3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                println("period는 2");
-                if(checkBox3.isChecked() == true) {
+                if (checkBox3.isChecked()) {
                     checkBox.setChecked(false);
                     checkBox2.setChecked(false);
                     period = 2;
+                    println("period는 2");
+                }
+                if(!checkBox.isChecked() && !checkBox2.isChecked() && !checkBox3.isChecked()){
+                    period = -1;
+                    println("period는 -1");
                 }
             }
         });
@@ -171,19 +188,30 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         return getTime;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 101){
+        if (requestCode == 101) {
 
             String date = data.getStringExtra("date");
-            TextView textView = (TextView)findViewById(R.id.editScheduleEndDate);
+            TextView textView = (TextView) findViewById(R.id.editScheduleEndDate);
             textView.setText(date + ' ' + getCurrentTime());
         }
     }
 
     // 하나라도 안적혀있으면 등록이 안된다고 알리는 알림을 호출하는 기능을 추가해야함.
     public String insertSchedule() {
+        start_hour = Integer.parseInt(scheduleStrDate.getText().toString().substring(11, 13));
+        start_min = Integer.parseInt(scheduleStrDate.getText().toString().substring(14, 16));
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, start_hour);
+        calendar.set(Calendar.MINUTE, start_min);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        diaryNotification(calendar);
+        println("requestCode : " + Integer.toString(requestCode));
         println("insertPerson 호출됨");
         Uri uri = ScheduleProvider.CONTENT_URI;
 
@@ -200,7 +228,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         long dateNum = calDate(strDate, endDate);
         String data = "";
 
-        for(int i=0; i<dateNum; ++i) {
+        for (int i = 0; i < dateNum; ++i) {
             data += '0';
         }
 
@@ -231,7 +259,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             println("query 결과 : " + cursor.getCount());
 
             int index = 0;
-            while(cursor.moveToNext()) {
+            while (cursor.moveToNext()) {
                 int id = cursor.getInt(cursor.getColumnIndex(columns[0]));
                 String title = cursor.getString(cursor.getColumnIndex(columns[1]));
                 String strDate = cursor.getString(cursor.getColumnIndex(columns[2]));
@@ -246,7 +274,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
                 index += 1;
             }
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -260,11 +288,11 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             String selection = DBHelper.SCHEDULE_START_DATE + " = ? and " + DBHelper.SCHEDULE_TITLE + " = ?";
             Cursor cursor = getContentResolver().query(uri, columns, selection, new String[]{strDate, title}, DBHelper.SCHEDULE_START_DATE + " ASC");
 
-            if(cursor.moveToNext()) {
+            if (cursor.moveToNext()) {
                 id = cursor.getInt(cursor.getColumnIndex(columns[0]));
             }
 
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -276,7 +304,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         Uri uri = ScheduleProvider.CONTENT_URI;
 
         String selection = "mobile = ?";
-        String[] selectionArgs = new String[] {"010-1000-1000"};
+        String[] selectionArgs = new String[]{"010-1000-1000"};
         ContentValues updateValue = new ContentValues();
         updateValue.put("mobile", "010-2000-2000");
 
@@ -289,7 +317,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         Uri uri = ScheduleProvider.CONTENT_URI;
 
         String selection = "name = ?";
-        String[] selectionArgs = new String[] {"john"};
+        String[] selectionArgs = new String[]{"john"};
 
         int count = getContentResolver().delete(uri, selection, selectionArgs);
         println("delete 결과 : " + count);
@@ -305,9 +333,8 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
             long calDate = BeginDate.getTime() - EndDate.getTime();
 
-            calDateDays = Math.abs(calDate / (24*60*60*1000));
-        }
-        catch(ParseException e) {
+            calDateDays = Math.abs(calDate / (24 * 60 * 60 * 1000));
+        } catch (ParseException e) {
             println("date 계산 예외 발생 : " + e);
         }
 
@@ -319,6 +346,48 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         testLog.append(data + "\n");
     }
 
+    void diaryNotification(Calendar calendar) {
+        Intent alarmIntent = new Intent(this, Alarm_Receiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, alarmIntent, 0);
+        requestCode = requestCode + 1;
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+
+        // 사용자가 매일 알람을 허용했다면
+        if(period == -1){
+                alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                }
+        }
+        else if (period == 2) {
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                }
+        }
+        else if (period == 1) {
+            int INTERVAL_2DAYS = 172800000;
+            if (alarmManager != null) {
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                            AlarmManager.INTERVAL_DAY, pendingIntent);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                }
+            }
+//        else { //Disable Daily Notifications
+//            if (PendingIntent.getBroadcast(this, 0, alarmIntent, 0) != null && alarmManager != null) {
+//                alarmManager.cancel(pendingIntent);
+//                //Toast.makeText(this,"Notifications were disabled",Toast.LENGTH_SHORT).show();
+//            }
+//            pm.setComponentEnabledSetting(receiver,
+//                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+//                    PackageManager.DONT_KILL_APP);
+//        }
+        }
+    }
+}
     // 이 함수를 service로 옮기기.
 //    private void registerAlarm(String requestType, String queryData) {
 //        // 알람메니저를 시스템에서 요청해서 가져오기.
@@ -339,4 +408,15 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 //        insertAlarm(requestType, queryData);
 //    }
 
-}
+////////////////알람 삭제////////////
+/*
+public void unregist(View view) {
+    Intent intent = new Intent(this, Alarm.class);
+    PendingIntent pIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+    alarmManager.cancel(pIntent);
+}// unregist()..
+*/
+// 부팅 후 실행되는 리시버 사용가능하게 설정
+            /*pm.setComponentEnabledSetting(receiver,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP);*/

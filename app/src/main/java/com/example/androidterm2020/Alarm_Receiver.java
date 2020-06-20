@@ -132,13 +132,13 @@ public class Alarm_Receiver extends BroadcastReceiver {
             nextNotifyTime.add(Calendar.DATE, 1);
 
             //  Preference에 설정한 값 저장
-            SharedPreferences.Editor editor = context.getSharedPreferences("daily alarm", MODE_PRIVATE).edit();
+            /*SharedPreferences.Editor editor = context.getSharedPreferences("daily alarm", MODE_PRIVATE).edit();
             editor.putLong("nextNotifyTime", nextNotifyTime.getTimeInMillis());
-            editor.apply();
+            editor.apply();*/
 
-            Date currentDateTime = nextNotifyTime.getTime();
+            /*Date currentDateTime = nextNotifyTime.getTime();
             String date_text = new SimpleDateFormat("yyyy년 MM월 dd일 EE요일 a hh시 mm분 ", Locale.getDefault()).format(currentDateTime);
-            Toast.makeText(context.getApplicationContext(),"다음 알람은 " + date_text + "으로 알람이 설정되었습니다!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context.getApplicationContext(),"다음 알람은 " + date_text + "으로 알람이 설정되었습니다!", Toast.LENGTH_SHORT).show();*/
         }
     }
 

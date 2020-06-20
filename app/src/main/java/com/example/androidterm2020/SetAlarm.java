@@ -108,9 +108,9 @@ public class SetAlarm extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),date_text + "으로 알람이 설정되었습니다!", Toast.LENGTH_SHORT).show();
 
                 //  Preference에 설정한 값 저장
-                SharedPreferences.Editor editor = getSharedPreferences("daily alarm", MODE_PRIVATE).edit();
+                /*SharedPreferences.Editor editor = getSharedPreferences("daily alarm", MODE_PRIVATE).edit();
                 editor.putLong("nextNotifyTime", (long)calendar.getTimeInMillis());
-                editor.apply();
+                editor.apply();*/
 
 
                 diaryNotification(calendar);

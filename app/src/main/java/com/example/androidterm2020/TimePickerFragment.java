@@ -3,17 +3,26 @@ package com.example.androidterm2020;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
-public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
-    boolean is_start;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
+import static android.content.Context.MODE_PRIVATE;
+
+public class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+    private boolean is_start;
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         String[] time = getArguments().getString("time").split(":");
@@ -32,7 +41,6 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
         title.setGravity(Gravity.CENTER_HORIZONTAL);
         // 더 예쁘게 수정하자. 글자크기, 배경.
         timePickerDialog.setCustomTitle(title);
-
         return timePickerDialog;
     }
 
@@ -40,16 +48,20 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         // 시간을 정하면 TextView에 시간을 변경해주는 기능.
         TextView textView = null;
-
-        if(is_start == true) {
+        TextView textView2 = null;
+        if(is_start) {
             textView = getActivity().findViewById(R.id.editScheduleStrDate);
+            textView2 = getActivity().findViewById(R.id.editScheduleEndDate);
+            String text = textView.getText().toString().split(" ")[0];
+            text += " " + (hourOfDay < 10 ? "0" : "" ) + hourOfDay + ":" + (minute < 10 ? "0" : "" ) + minute;
+            textView.setText(text);
+            textView2.setText(text);
         }
         else {
             textView = getActivity().findViewById(R.id.editScheduleEndDate);
+            String text = textView.getText().toString().split(" ")[0];
+            text += " " + (hourOfDay < 10 ? "0" : "" ) + hourOfDay + ":" + (minute < 10 ? "0" : "" ) + minute;
+            textView.setText(text);
         }
-
-        String text = textView.getText().toString().split(" ")[0];
-        text += " " + (hourOfDay < 10 ? "0" : "" ) + hourOfDay + ":" + (minute < 10 ? "0" : "" ) + minute;
-        textView.setText(text);
     }
 }
