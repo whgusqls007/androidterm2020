@@ -86,12 +86,12 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
         GetWeatherData(latitude, longitude);
         Button ShowLocationButton = (Button) findViewById(R.id.button);
-        ShowLocationButton.setOnClickListener(new View.OnClickListener() {
+        /*ShowLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), SetAlarm.class);
                 startActivity(intent);
-            }
+            }*/
             /*@SuppressLint("SetTextI18n")
             @Override
             public void onClick(View arg0)
@@ -109,8 +109,8 @@ public class MainActivity extends AppCompatActivity {
 
                 Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
                 GetWeatherData(latitude, longitude);
-            }*/
-        });
+            }
+        });*/
 
         myToolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);

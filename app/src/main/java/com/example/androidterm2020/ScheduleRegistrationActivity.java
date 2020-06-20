@@ -29,6 +29,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 // 모든 값을 입력하지 않았을 경우 스넥바 보여주기,
 public class ScheduleRegistrationActivity extends AppCompatActivity {
@@ -40,8 +41,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     int period = -1; // 나중에 checkbox와 연동되도록 코드를 추가해주자.
     TextView testLog;
     // 달력에서 날짜 누르고 여기 올때 자동으로 날짜 + 시간을 추가해주는 기능.
-    String start_time;
-    int start_hour, start_min;
+    String start_date;
     int requestCode = 0;
 
     @SuppressLint("SetTextI18n")
@@ -65,7 +65,8 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         details = (EditText) findViewById(R.id.editDetails);
         testLog = (TextView) findViewById(R.id.logTxt); // 임시로 이용하는 로그 비슷한 기능담당할 놈.
         println("로그 창 생성완료.");
-        requestCode = requestCode + 1;
+        start_date = scheduleStrDate.getText().toString();
+        test_view.setText(start_date);
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -202,14 +203,18 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
     // 하나라도 안적혀있으면 등록이 안된다고 알리는 알림을 호출하는 기능을 추가해야함.
     public String insertSchedule() {
-        start_hour = Integer.parseInt(scheduleStrDate.getText().toString().substring(11, 13));
-        start_min = Integer.parseInt(scheduleStrDate.getText().toString().substring(14, 16));
-        Calendar calendar = Calendar.getInstance();
+        int start_hour = Integer.parseInt(scheduleStrDate.getText().toString().substring(11, 13));
+        int start_min = Integer.parseInt(scheduleStrDate.getText().toString().substring(14, 16));
+        int start_year = Integer.parseInt(scheduleStrDate.getText().toString().substring(0, 4));
+        int start_month = Integer.parseInt(scheduleStrDate.getText().toString().substring(5, 7));
+        int start_day = Integer.parseInt(scheduleStrDate.getText().toString().substring(8, 10));
+        GregorianCalendar calendar = (GregorianCalendar)GregorianCalendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, start_hour);
-        calendar.set(Calendar.MINUTE, start_min);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(start_year, start_month - 1, start_day, start_hour, start_min, 0);
+        if(calendar.before(Calendar.getInstance())){
+            calendar.add(GregorianCalendar.YEAR, 1);
+            Toast.makeText(ScheduleRegistrationActivity.this, "내년으로 설정", Toast.LENGTH_LONG).show();
+        }
         diaryNotification(calendar);
         println("requestCode : " + Integer.toString(requestCode));
         println("insertPerson 호출됨");
@@ -346,34 +351,40 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         testLog.append(data + "\n");
     }
 
+    @SuppressLint("ShortAlarm")
     void diaryNotification(Calendar calendar) {
         Intent alarmIntent = new Intent(this, Alarm_Receiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, alarmIntent, 0);
-        requestCode = requestCode + 1;
+        //requestCode = requestCode + 1;
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-
-        // 사용자가 매일 알람을 허용했다면
         if(period == -1){
-                alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+            if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                }else{
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
                 }
+            }
         }
         else if (period == 2) {
-                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+            long INTERVAL = 1000 * 60;
+            if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
+                }else{
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
                 }
+            }
         }
         else if (period == 1) {
-            int INTERVAL_2DAYS = 172800000;
+            long INTERVAL = 1000 * 30;
             if (alarmManager != null) {
-                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                            AlarmManager.INTERVAL_DAY, pendingIntent);
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
+                }else{
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
                 }
             }
 //        else { //Disable Daily Notifications
