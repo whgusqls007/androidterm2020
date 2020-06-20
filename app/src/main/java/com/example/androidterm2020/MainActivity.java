@@ -190,11 +190,12 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView parent, View v, int position, long id){
                 switch (position){
                     case 0 :
-                        Intent intent = new Intent(getApplicationContext(), ShowAllSchedule.class);
-                        startActivity(intent);
+                        Intent scheduleIntent = new Intent(getApplicationContext(), ShowAllSchedule.class);
+                        startActivity(scheduleIntent);
                         break;
                     case 1 :
-
+                        Intent settingIntent = new Intent(getApplicationContext(), Setting.class);
+                        startActivity(settingIntent);
                         break;
                 }
 
