@@ -31,6 +31,7 @@ import android.location.Geocoder;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     Toolbar myToolbar;
     ListViewAdapter adapter;
     private GpsTracker gpsTracker;
-
+    SharedPreferences prefs;
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
@@ -68,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
         }else {
             checkRunTimePermission();
         }
-
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean settinginfo = prefs.getBoolean("notify_on_off", true);
         // gps 관련
         final TextView textview_address = (TextView)findViewById(R.id.textview);
         final EditText textview_Latitude = (EditText)findViewById(R.id.Ed1);
@@ -82,7 +84,11 @@ public class MainActivity extends AppCompatActivity {
         final double longitude = gpsTracker.getLongitude();
 
         String address = getCurrentAddress(latitude, longitude);
-        textview_address.setText(address);
+        if(settinginfo) {
+            textview_address.setText("True");
+        }else{
+            textview_address.setText("False");
+        }
         textview_Latitude.setText(Double.toString(latitude));
         textview_Longitude.setText(Double.toString(longitude));
 

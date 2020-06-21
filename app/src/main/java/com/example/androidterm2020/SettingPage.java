@@ -1,6 +1,8 @@
 package com.example.androidterm2020;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceFragment;
@@ -9,6 +11,9 @@ import android.preference.PreferenceScreen;
 import android.widget.BaseAdapter;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+
+import java.util.prefs.Preferences;
 
 public class SettingPage extends PreferenceFragment {
 
@@ -17,17 +22,16 @@ public class SettingPage extends PreferenceFragment {
     PreferenceScreen NotifyView;
     ListPreference NotifySelct;
     ListPreference NotifyTime;
+    SettingPage context = this;
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.setting_page);
-
         NotifyView = (PreferenceScreen)findPreference("notify");
         NotifySelct = (ListPreference)findPreference("notify_select");
-        NotifyTime = (ListPreference)findPreference("notify_time");
-
+        NotifyTime = (ListPreference)findPreference("notify_time");;
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
         if(prefs.getBoolean("notify_on_off", true)){
             NotifyView.setSummary("사용");
             SettingInfo.Noti_on_off = true;

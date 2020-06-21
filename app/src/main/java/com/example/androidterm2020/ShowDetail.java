@@ -325,8 +325,8 @@ public class ShowDetail extends AppCompatActivity {
         if(alarmManager != null) {
             alarmManager.cancel(pIntent);
         }
-        SharedPreferences pref = getPreferences(this);
-        SharedPreferences.Editor editor = pref.edit();
+        SharedPreferences preference = getPreferences(this);
+        SharedPreferences.Editor editor = preference.edit();
         editor.remove(Integer.toString(deleteCode));
         editor.apply();
     }

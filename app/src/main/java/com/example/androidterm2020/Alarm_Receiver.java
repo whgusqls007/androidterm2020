@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -34,7 +35,7 @@ public class Alarm_Receiver extends BroadcastReceiver {
     GpsTracker gpsTracker;
     String[] Weather = new String[5];
     String[] Air = new String[2];
-
+    Alarm_Receiver context = this;
     @Override
     public void onReceive(Context context, Intent intent) {
         // 날씨가 마스크 알림에 덮혀 씹힌다. 2개의 알림을 동시에 볼 수 있게 해야함.
@@ -120,8 +121,9 @@ public class Alarm_Receiver extends BroadcastReceiver {
 //                .setStyle(new NotificationCompat.BigTextStyle().bigText("대기상태 : " + getAirQuality() + "\n + pm25 : " + Air[0] + ", pm10 : " + Air[1]))
 //                .setContentInfo("INFO")
 //                .setContentIntent(pendingI);
-
-        if (notificationManager != null) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean allow_alarm = prefs.getBoolean("notify_on_off", false);
+        if (notificationManager != null && allow_alarm) {
             // 노티피케이션 동작시킴
             notificationManager.notify(1234, builder.build());
         }
