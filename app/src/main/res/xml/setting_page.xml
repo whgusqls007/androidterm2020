@@ -17,7 +17,7 @@
                 android:key="notify_select"
                 android:summary="알림 받을 정보 선택"
                 android:title="알림 종류 선택"
-                android:defaultValue="All"
+                android:defaultValue="1"
                 android:dependency="notify_on_off"/>
             <ListPreference
                 android:entries="@array/array_time"
