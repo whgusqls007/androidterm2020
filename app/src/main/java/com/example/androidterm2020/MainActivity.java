@@ -20,6 +20,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -72,9 +73,11 @@ public class MainActivity extends AppCompatActivity {
         final TextView textview_address = (TextView)findViewById(R.id.textview);
         final EditText textview_Latitude = (EditText)findViewById(R.id.Ed1);
         final EditText textview_Longitude = (EditText)findViewById(R.id.Ed2);
-
+        /*SharedPreferences pref = getPreferences(this);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.clear();
+        editor.commit();*/
         gpsTracker = new GpsTracker(MainActivity.this);
-
         final double latitude = gpsTracker.getLatitude();
         final double longitude = gpsTracker.getLongitude();
 
@@ -462,5 +465,7 @@ public class MainActivity extends AppCompatActivity {
         nm.createNotificationChannel(channel);
         nm.notify(5678, builder.build());
     }
-
+    private static SharedPreferences getPreferences(Context context) {
+        return context.getSharedPreferences("Alarm", Context.MODE_PRIVATE);
+    }
 }

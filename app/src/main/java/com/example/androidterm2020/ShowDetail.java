@@ -2,7 +2,11 @@ package com.example.androidterm2020;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,7 +36,7 @@ public class ShowDetail extends AppCompatActivity {
     LinearLayout.LayoutParams checkBoxParam = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f);
     LinearLayout.LayoutParams buttonsParam = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 3f);
 
-
+    int count;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -180,6 +184,7 @@ public class ShowDetail extends AppCompatActivity {
                     }
                     deleteSchedule(idList);
                 }
+                restartScreen();
             }
         });
 
@@ -302,13 +307,30 @@ public class ShowDetail extends AppCompatActivity {
     private void deleteSchedule(final ArrayList<Integer> idList) {
         Uri uri = ScheduleProvider.CONTENT_URI;
 
-        for(final int ID: idList) {
+        //for(final int ID: idList) {
+        for(int i=0; i<idList.size(); i++){
+            int ID = idList.get(i);
             String selection = DBHelper.SCHEDULE_ID + " = " + ID;
-
             getContentResolver().delete(uri, selection, null);
+            unregist(1);
         }
-        if (idList.size() > 0) {
+        /*if (idList.size() > 0) {
             restartScreen();
+        }*/
+    }
+    public void unregist(int deleteCode) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, Alarm_Receiver.class);
+        PendingIntent pIntent = PendingIntent.getBroadcast(this, deleteCode, intent, 0);
+        if(alarmManager != null) {
+            alarmManager.cancel(pIntent);
         }
+        SharedPreferences pref = getPreferences(this);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.remove(Integer.toString(deleteCode));
+        editor.apply();
+    }
+    private static SharedPreferences getPreferences(Context context) {
+        return context.getSharedPreferences("Alarm", Context.MODE_PRIVATE);
     }
 }

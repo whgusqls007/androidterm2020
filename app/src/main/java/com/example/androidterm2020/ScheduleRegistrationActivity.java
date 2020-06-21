@@ -15,6 +15,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -42,7 +43,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     TextView testLog;
     // 달력에서 날짜 누르고 여기 올때 자동으로 날짜 + 시간을 추가해주는 기능.
     String start_date;
-    int requestCode = 0;
+    boolean allow_alarm = true;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -203,20 +204,23 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
     // 하나라도 안적혀있으면 등록이 안된다고 알리는 알림을 호출하는 기능을 추가해야함.
     public String insertSchedule() {
-        int start_hour = Integer.parseInt(scheduleStrDate.getText().toString().substring(11, 13));
-        int start_min = Integer.parseInt(scheduleStrDate.getText().toString().substring(14, 16));
-        int start_year = Integer.parseInt(scheduleStrDate.getText().toString().substring(0, 4));
-        int start_month = Integer.parseInt(scheduleStrDate.getText().toString().substring(5, 7));
-        int start_day = Integer.parseInt(scheduleStrDate.getText().toString().substring(8, 10));
-        GregorianCalendar calendar = (GregorianCalendar)GregorianCalendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(start_year, start_month - 1, start_day, start_hour, start_min, 0);
-        if(calendar.before(Calendar.getInstance())){
-            calendar.add(GregorianCalendar.YEAR, 1);
-            Toast.makeText(ScheduleRegistrationActivity.this, "내년으로 설정", Toast.LENGTH_LONG).show();
+        if(allow_alarm) {
+            int start_hour = Integer.parseInt(scheduleStrDate.getText().toString().substring(11, 13));
+            int start_min = Integer.parseInt(scheduleStrDate.getText().toString().substring(14, 16));
+            int start_year = Integer.parseInt(scheduleStrDate.getText().toString().substring(0, 4));
+            int start_month = Integer.parseInt(scheduleStrDate.getText().toString().substring(5, 7));
+            int start_day = Integer.parseInt(scheduleStrDate.getText().toString().substring(8, 10));
+            GregorianCalendar calendar = (GregorianCalendar) GregorianCalendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.set(start_year, start_month - 1, start_day+1, start_hour, start_min, 0);
+            if (calendar.before(Calendar.getInstance())) {
+                calendar.add(GregorianCalendar.YEAR, 1);
+                calendar.add(GregorianCalendar.DATE, -1);
+                Toast.makeText(ScheduleRegistrationActivity.this, "내년으로 설정", Toast.LENGTH_LONG).show();
+            }
+            calendar.add(GregorianCalendar.DATE, -1);
+            diaryNotification(calendar);
         }
-        diaryNotification(calendar);
-        println("requestCode : " + Integer.toString(requestCode));
         println("insertPerson 호출됨");
         Uri uri = ScheduleProvider.CONTENT_URI;
 
@@ -353,10 +357,24 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
     @SuppressLint("ShortAlarm")
     void diaryNotification(Calendar calendar) {
+        int alarm_requestCode = 0;
         Intent alarmIntent = new Intent(this, Alarm_Receiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, alarmIntent, 0);
-        //requestCode = requestCode + 1;
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarm_requestCode, alarmIntent, 0);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        SharedPreferences preference = getPreferences(this);
+        SharedPreferences.Editor editor = preference.edit();
+        SharedPreferences getprefrence = getPreferences(this);
+        while(true) {
+            int checkcode = getprefrence.getInt(Integer.toString(alarm_requestCode), -1);
+            if(checkcode == -1){
+                break;
+            }else{
+                alarm_requestCode = alarm_requestCode + 1;
+            }
+        }
+        editor.putInt(Integer.toString(alarm_requestCode), alarm_requestCode);
+        editor.apply();
+
         if(period == -1){
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -397,6 +415,9 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 //                    PackageManager.DONT_KILL_APP);
 //        }
         }
+    }
+    private static SharedPreferences getPreferences(Context context) {
+        return context.getSharedPreferences("Alarm", Context.MODE_PRIVATE);
     }
 }
     // 이 함수를 service로 옮기기.
