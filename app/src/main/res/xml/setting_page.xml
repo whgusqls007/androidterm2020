@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="환경설정">
+
+        <PreferenceScreen
+            android:key="notify"
+            android:title="알림 설정"
+            android:summary="사용안함">
+            <SwitchPreference
+                android:defaultValue="false"
+                android:key="notify_on_off"
+                android:summary="알림을 쓸것인지를 선택하시고 \n어떤 알림을 쓰실 것인지 선택하세요"
+                android:title="알림 여부"/>
+            <ListPreference
+                android:entries="@array/array_notify"
+                android:entryValues="@array/array_notify"
+                android:key="notify_select"
+                android:summary="알림 받을 정보 선택"
+                android:title="알림 종류 선택"
+                android:defaultValue="All"
+                android:dependency="notify_on_off"/>
+            <ListPreference
+                android:entries="@array/array_time"
+                android:entryValues="@array/array_time"
+                android:key="notify_time"
+                android:summary="알림 받을 시간 선택"
+                android:title="알림 시간 선택"
+                android:defaultValue="1시간 전"
+                android:dependency="notify_on_off"/>
+        </PreferenceScreen>
+    </PreferenceCategory>
+</PreferenceScreen>

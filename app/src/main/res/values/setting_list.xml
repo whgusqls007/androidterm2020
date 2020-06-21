@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="array_notify">
+        <item>일정</item>
+        <item>기상 정보</item>
+        <item>All</item>
+    </string-array>
+    <string-array name="array_time">
+        <item>1시간 전</item>
+        <item>2시간 전</item>
+        <item>3시간 전</item>
+    </string-array>
+</resources>

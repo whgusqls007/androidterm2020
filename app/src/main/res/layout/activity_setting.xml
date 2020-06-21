@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/setting"
-        android:name="com.example.androidterm2020.ConfigurationSetting"
+        android:name="com.example.androidterm2020.SettingPage"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
