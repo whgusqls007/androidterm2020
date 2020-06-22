@@ -120,7 +120,7 @@
             android:layout_width="200dp"
             android:layout_height="match_parent"
             android:layout_gravity="left"
-            android:background="#00FFFF" >
+            android:background="@drawable/listview_shape" >
 
         </ListView>
 

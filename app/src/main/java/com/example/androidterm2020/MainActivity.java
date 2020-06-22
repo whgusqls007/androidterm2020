@@ -194,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
             MaskNotification();
         }
 
+        adapter.addItem("종료");
         listView.setOnItemClickListener(new ListView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView parent, View v, int position, long id){
@@ -205,6 +206,27 @@ public class MainActivity extends AppCompatActivity {
                     case 1 :
                         Intent settingIntent = new Intent(getApplicationContext(), Setting.class);
                         startActivity(settingIntent);
+                        break;
+                    case 4:
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setMessage("정말로 종료하시겠습니까?");
+                        builder.setTitle("종료 알림창")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int i) {
+                                        finish();
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int i) {
+                                        dialog.cancel();
+                                    }
+                                });
+                        AlertDialog alert = builder.create();
+                        alert.setTitle("종료 알림창");
+                        alert.show();
                         break;
                 }
 

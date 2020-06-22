@@ -72,7 +72,7 @@ public class ListViewAdapter extends BaseAdapter {
                     break;
             }
         }
-
+        convertView.setBackgroundResource(R.drawable.listview_shape);
         return convertView;
     }
 
