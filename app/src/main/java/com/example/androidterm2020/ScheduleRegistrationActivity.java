@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -28,7 +29,9 @@ import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 // 모든 값을 입력하지 않았을 경우 스넥바 보여주기,
@@ -112,23 +115,6 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
     private void initScheduleViewModel () {
         scheduleViewModel = new ViewModelProvider(this).get(ScheduleViewModel.class);
-        scheduleViewModel.getAllSchedules().observe(this, new Observer<List<Schedule>>() {
-            @Override
-            public void onChanged(@Nullable final List<Schedule> schedules) {
-                println("총 스케쥴의 수 : " + schedules.size());
-                for (Schedule schedule : schedules) {
-                    println("id : " + schedule.getSid() + ", title : " + schedule.getTitle()
-                            + ", strDate : " + schedule.getStrDate()
-                            + ", endDate : " + schedule.getEndDate()
-                            + ", details :" + schedule.getDetails()
-                            + ", period : " + schedule.getPeriod()
-                            + ", dateNum : " + schedule.getDateNum()
-                            + ", index : " + schedule.getIndex()
-                            + ", achiveData : " + schedule.getAchievementData()
-                    );
-                }
-            }
-        });
     }
 
     private void initUI(String datetime) {
@@ -149,7 +135,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             public void onClick(View v) {
                 TimePickerFragment timePickerFragment = new TimePickerFragment();
                 Bundle bundle = new Bundle();
-                // sql의 datetime에서 뒷부분인 시간을 bundle에 넣음.
+
                 bundle.putString("time", scheduleStrDate.getText().toString().split(" ")[1]);
                 bundle.putBoolean("is_start", true);
                 timePickerFragment.setArguments(bundle);
@@ -161,7 +147,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             public void onClick(View v) {
                 TimePickerFragment timePickerFragment = new TimePickerFragment();
                 Bundle bundle = new Bundle();
-                // sql의 datetime에서 뒷부분인 시간을 bundle에 넣음.
+
                 bundle.putString("time", scheduleEndDate.getText().toString().split(" ")[1]);
                 bundle.putBoolean("is_start", false);
                 timePickerFragment.setArguments(bundle);
@@ -171,7 +157,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     }
 
     private void println(String s) {
-
+        testLog.append(s + "\n");
     }
 
     private void setCheckBoxes() {
@@ -283,6 +269,24 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
     // 하나라도 안적혀있으면 등록이 안된다고 알리는 알림을 호출하는 기능을 추가해야함.
     private int insertSchedule() {
+        if(allow_alarm) {
+            int start_hour = Integer.parseInt(scheduleStrDate.getText().toString().substring(11, 13));
+            int start_min = Integer.parseInt(scheduleStrDate.getText().toString().substring(14, 16));
+            int start_year = Integer.parseInt(scheduleStrDate.getText().toString().substring(0, 4));
+            int start_month = Integer.parseInt(scheduleStrDate.getText().toString().substring(5, 7));
+            int start_day = Integer.parseInt(scheduleStrDate.getText().toString().substring(8, 10));
+            GregorianCalendar calendar = (GregorianCalendar) GregorianCalendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.set(start_year, start_month - 1, start_day+1, start_hour, start_min, 0);
+            if (calendar.before(Calendar.getInstance())) {
+                calendar.add(GregorianCalendar.YEAR, 1);
+                calendar.add(GregorianCalendar.DATE, -1);
+                Toast.makeText(ScheduleRegistrationActivity.this, "내년으로 설정", Toast.LENGTH_LONG).show();
+            }
+            calendar.add(GregorianCalendar.DATE, -1);
+            diaryNotification(calendar);
+        }
+
         SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm:ss");
         String titleName = title.getText().toString();
         long strDate = getLongDate(scheduleStrDate.getText().toString());
@@ -327,5 +331,78 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             calDateDays = (int)Math.abs(calDate / (24 * 60 * 60 * 1000));
         }
         return calDateDays + 1;
+    }
+    @SuppressLint("ShortAlarm")
+    void diaryNotification(Calendar calendar) {
+        int alarm_requestCode = 0;
+        Intent alarmIntent = new Intent(this, Alarm_Receiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarm_requestCode, alarmIntent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        SharedPreferences preference = getPreferences(this);
+        SharedPreferences.Editor editor = preference.edit();
+        SharedPreferences getprefrence = getPreferences(this);
+        while(true) {
+            int checkcode = getprefrence.getInt(Integer.toString(alarm_requestCode), -1);
+            if(checkcode == -1){
+                break;
+            }else{
+                alarm_requestCode = alarm_requestCode + 1;
+            }
+        }
+        editor.putInt(Integer.toString(alarm_requestCode), alarm_requestCode);
+        editor.apply();
+
+        if(period == -1){
+            if (alarmManager != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                }else{
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                }
+            }
+        }
+        else if (period == 2) {
+            long INTERVAL = 1000 * 60;
+            if (alarmManager != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
+                }else{
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
+                }
+            }
+        }
+        else if (period == 1) {
+            long INTERVAL = 1000 * 30;
+            if (alarmManager != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
+                }else{
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
+                }
+            }
+//        else { //Disable Daily Notifications
+//            if (PendingIntent.getBroadcast(this, 0, alarmIntent, 0) != null && alarmManager != null) {
+//                alarmManager.cancel(pendingIntent);
+//                //Toast.makeText(this,"Notifications were disabled",Toast.LENGTH_SHORT).show();
+//            }
+//            pm.setComponentEnabledSetting(receiver,
+//                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+//                    PackageManager.DONT_KILL_APP);
+//        }
+        }
+    }
+    private static SharedPreferences getPreferences(Context context) {
+        return context.getSharedPreferences("Alarm", Context.MODE_PRIVATE);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item ){
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

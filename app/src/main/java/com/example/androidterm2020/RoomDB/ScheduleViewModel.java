@@ -33,10 +33,23 @@ public class ScheduleViewModel extends AndroidViewModel {
         return id;
     }
 
-    public LiveData<List<Schedule>> getAllSchedules() {
-        LiveData<List<Schedule>> schedules = null;
+    public List<Schedule> getAllSchedules() {
+        List<Schedule> schedules = null;
         try {
             schedules = new getAllScheduleAsyncTask(mRoomDatabase.scheduleDao()).execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return schedules;
+    }
+
+    public LiveData<List<Schedule>> getAllSchedulesObserve() {
+        LiveData<List<Schedule>> schedules = null;
+        try {
+            schedules = new getAllScheduleObserveAsyncTask(mRoomDatabase.scheduleDao()).execute().get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -106,7 +119,7 @@ public class ScheduleViewModel extends AndroidViewModel {
     }
 
 
-    public class getAllScheduleAsyncTask extends AsyncTask<Void, Void, LiveData<List<Schedule>>> {
+    public class getAllScheduleAsyncTask extends AsyncTask<Void, Void, List<Schedule>> {
         private ScheduleDao scheduleDao;
 
         public getAllScheduleAsyncTask(ScheduleDao scheduleDao) {
@@ -114,10 +127,24 @@ public class ScheduleViewModel extends AndroidViewModel {
         }
 
         @Override
-        protected LiveData<List<Schedule>> doInBackground(Void... voids) {
+        protected List<Schedule> doInBackground(Void... voids) {
             return scheduleDao.getALLSchedules();
         }
     }
+
+    public class getAllScheduleObserveAsyncTask extends AsyncTask<Void, Void, LiveData<List<Schedule>>> {
+        private ScheduleDao scheduleDao;
+
+        public getAllScheduleObserveAsyncTask(ScheduleDao scheduleDao) {
+            this.scheduleDao = scheduleDao;
+        }
+
+        @Override
+        protected LiveData<List<Schedule>> doInBackground(Void... voids) {
+            return scheduleDao.getALLSchedulesObserve();
+        }
+    }
+
 
     public class insertScheduleAsyncTask extends AsyncTask<Schedule, Void, Integer> {
         private ScheduleDao scheduleDao;

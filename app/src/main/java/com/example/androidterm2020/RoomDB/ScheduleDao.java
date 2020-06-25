@@ -13,8 +13,11 @@ import java.util.List;
 
 @Dao
 public interface ScheduleDao {
-    @Query("SELECT * from schedule_tb ORDER BY sid ASC")
-    LiveData<List<Schedule>> getALLSchedules();
+    @Query("SELECT * from schedule_tb ORDER BY strDate ASC")
+    List<Schedule> getALLSchedules();
+
+    @Query("SELECT * from schedule_tb ORDER BY strDate ASC")
+    LiveData<List<Schedule>> getALLSchedulesObserve();
 
     @Query("SELECT * from schedule_tb WHERE strDate >= :from  AND strDate <= :to ORDER BY strDate ASC")
     List<Schedule> getDateSchedules(long from, long to);

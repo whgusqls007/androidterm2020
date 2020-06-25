@@ -24,17 +24,17 @@ public class PickDActivity extends AppCompatActivity {
                 Intent intent2 = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
                 String date = year + "-" + (month > 9 ? "" : "0") + (month + 1) + "-" + (DayOfMonth > 9 ? "" : "0") + DayOfMonth;
                 if((Integer.parseInt(date.substring(0, 4)) < Integer.parseInt(cur_date.substring(0,4)))
-                        ||
-                        (Integer.parseInt(date.substring(0, 4)) == Integer.parseInt(cur_date.substring(0,4)) &&
-                                Integer.parseInt(date.substring(5, 7)) < Integer.parseInt(cur_date.substring(5,7)))
-                        ||
-                        (Integer.parseInt(date.substring(0, 4)) == Integer.parseInt(cur_date.substring(0,4)) &&
-                                Integer.parseInt(date.substring(5, 7)) == Integer.parseInt(cur_date.substring(5,7)) &&
-                                Integer.parseInt(date.substring(8,10)) < Integer.parseInt(cur_date.substring(8, 10)))){
-                    intent2.putExtra("date", cur_date);
-                    Toast.makeText(PickDActivity.this, "종료날짜가 시작날짜보다 빠름.", Toast.LENGTH_LONG).show();
-                    setResult(ScheduleRegistrationActivity.RESULT_CANCELED, intent2);
-                    finish();
+                            ||
+                            (Integer.parseInt(date.substring(0, 4)) == Integer.parseInt(cur_date.substring(0,4)) &&
+                                    Integer.parseInt(date.substring(5, 7)) < Integer.parseInt(cur_date.substring(5,7)))
+                            ||
+                            (Integer.parseInt(date.substring(0, 4)) == Integer.parseInt(cur_date.substring(0,4)) &&
+                                    Integer.parseInt(date.substring(5, 7)) == Integer.parseInt(cur_date.substring(5,7)) &&
+                                    Integer.parseInt(date.substring(8,10)) < Integer.parseInt(cur_date.substring(8, 10)))){
+                        intent2.putExtra("date", cur_date);
+                        Toast.makeText(PickDActivity.this, "종료날짜가 시작날짜보다 빠름.", Toast.LENGTH_LONG).show();
+                        setResult(ScheduleRegistrationActivity.RESULT_CANCELED, intent2);
+                        finish();
                 }
                 intent2.putExtra("date", date);
                 setResult(ScheduleRegistrationActivity.RESULT_OK, intent2);

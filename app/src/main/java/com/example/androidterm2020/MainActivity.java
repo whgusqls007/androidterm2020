@@ -110,12 +110,6 @@ public class MainActivity extends AppCompatActivity {
     private void setScheduleViewModel() {
         date = getTodayDate();
         scheduleViewModel = new ViewModelProvider(this).get(ScheduleViewModel.class);
-        scheduleViewModel.getAllSchedules().observe(this, new Observer<List<Schedule>>() {
-            @Override
-            public void onChanged(@Nullable final List<Schedule> schedules) {
-                mAllSchedule = schedules;
-            }
-        });
     }
 
     private void setGps() {

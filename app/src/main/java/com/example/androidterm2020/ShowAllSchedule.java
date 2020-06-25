@@ -1,105 +1,212 @@
 package com.example.androidterm2020;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
-public class ShowAllSchedule extends AppCompatActivity {
+import com.example.androidterm2020.RoomDB.Schedule;
+import com.example.androidterm2020.RoomDB.ScheduleViewModel;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+
+import java.util.List;
+
+public class ShowAllSchedule extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FragmentCallback{
+
+    Toolbar myToolbar;
+    DrawerLayout drawer;
+
+    AchieveAllListFragment achieveAllListFragment;
+    ScheduleAllModificationFragment scheduleAllModificationFragment;
+    DeleteAllSchedulesFragment deleteAllSchedulesFragment;
+
+    List<Schedule> mSchedules;
+    ScheduleViewModel scheduleViewModel;
+    String date;
+    FloatingActionButton floatingActionButton;
+
+    final static int REGISTRATION_REQUEST_CODE = 111;
+
+    int count;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_all_schedule);
+        setContentView(R.layout.show_detail);
 
-        LinearLayout container = new LinearLayout(this);
-        container.setOrientation(LinearLayout.VERTICAL);
-
-        LinearLayout.LayoutParams defaultParams1 = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        LinearLayout.LayoutParams defaultParams2 = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-        );
-
-        // 블럭 생성 및 설정
-        LinearLayout block1 = new LinearLayout(this); // 윗 공간, 스크롤뷰가 차지할 공간
-        LinearLayout block2 = new LinearLayout(this); // 아래 공간, 일단 비워둠. 임시 버튼 1개
-        block1.setOrientation(LinearLayout.VERTICAL);
-        block2.setOrientation(LinearLayout.VERTICAL);
-        block1.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 500)); // 일부만 차지.
-
-        ScrollView scrollView = new ScrollView(this);
-        LinearLayout scheduleList = new LinearLayout(this);
-        scheduleList.setOrientation(LinearLayout.VERTICAL);
-
-        // 윗 공간을 차지할 버튼들, 스크롤 뷰에 들어감. // block1에 소속된 스크롤 뷰
-        Button[] buttons = new Button[20];
-        LinearLayout[] scheduleSet = new LinearLayout[20];
-
-        LinearLayout.LayoutParams checkBoxParam = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f);
-        LinearLayout.LayoutParams buttonsParam = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 3f);
-
-        checkBoxParam.rightMargin = 5;
-        buttonsParam.leftMargin = 10;
-        buttonsParam.rightMargin = 10;
-
-        // 버튼들을 만든다.
-        for(int i=0; i<20; ++i) {
-            scheduleSet[i] = new LinearLayout(this);
-            buttons[i] = new Button(this);
-            CheckBox checkBox = new CheckBox(this);
-            checkBox.setId(i);
-
-            scheduleSet[i].setOrientation(LinearLayout.HORIZONTAL); // checkbox랑 달성도로 이동하는 버튼
+        init();
 
 
-            buttons[i].setText("일정 " + (i+1));
-            buttons[i].setLayoutParams(defaultParams1);
-            buttons[i].setLayoutParams(buttonsParam);
-            checkBox.setLayoutParams(checkBoxParam);
+        drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, myToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
-            scheduleSet[i].addView(checkBox);
-            scheduleSet[i].addView(buttons[i]);
-            scheduleList.addView(scheduleSet[i]);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.getHeaderView(0);
+        TextView time = (TextView) headerView.findViewById(R.id.todayDatetime);
+        time.setText(date); // 여기가 사이드바의 시간부분에 넣는 곳이다.
+
+        final Bundle bundle = new Bundle();
+        bundle.putString("date", date); // 번들을 잘 넘김.
+
+        scheduleViewModel = new ViewModelProvider(this).get(ScheduleViewModel.class);
+
+        myToolbar.setTitle("달성도 확인");
+        getSupportFragmentManager().beginTransaction().add(R.id.container, AchieveAllListFragment.class, bundle).commit();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
-        scrollView.addView(scheduleList);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) { // 사이드 매뉴에서 선택 되면.
+        int id = item.getItemId();
+        Bundle bundle = new Bundle();
+        bundle.putString("date", date);
+
+        if(id == R.id.achieveList) {
+            Toast.makeText(this, "첫 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
+            onFragmentSelected(0, bundle);
+            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
+        }
+        else if(id == R.id.scheduleModification) {
+            Toast.makeText(this, "두 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
+            onFragmentSelected(1, bundle);
+            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
+        }
+        else if (id == R.id.deleteSchedules) {
+            Toast.makeText(this, "세 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
+            onFragmentSelected(2, bundle);
+            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.delete));
+        }
+
+        drawer.closeDrawer(GravityCompat.START);
+
+        return true;
+    }
+
+    @Override
+    public void onFragmentSelected(int position, Bundle bundle) { // 여기로 와서 화면을 바꾼다.
+        Fragment curFragment = null;
+        String tag = null;
+        if(position == 0) {
+            curFragment = achieveAllListFragment;
+            myToolbar.setTitle("달성도");
+            tag = "achieve";
+        }
+        else if(position == 1) {
+            curFragment = scheduleAllModificationFragment;
+            myToolbar.setTitle("일정 수정");
+            tag = "mofify";
+        }
+        else if(position == 2) {
+            curFragment = deleteAllSchedulesFragment;
+            myToolbar.setTitle("일정 삭제");
+            tag = "delete";
+        }
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, curFragment,  tag).commit();
+    }
 
 
-        // 아랫 공간을 차지할 임시버튼.
-        Button tempButton = new Button(this);
-        tempButton.setText("임시 일정등록 버튼");
-        tempButton.setLayoutParams(defaultParams1);
+    private void init() {
+        initToolbar();
+        initFragment();
+        floatingActionButton = findViewById(R.id.floatingActionButton);
+        floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
+                if(fragment instanceof DeleteAllSchedulesFragment && ((DeleteAllSchedulesFragment) fragment).getScheduleNum() > 0) {
+                        Toast.makeText(getApplicationContext(), "일정삭제", Toast.LENGTH_SHORT).show();
+                        ((DeleteAllSchedulesFragment) fragment).deleteSchedules();
+                        onFragmentSelected(0, null);
+                        onFragmentSelected(2, null);
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "일정등록", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
+                    intent.putExtra("date", getIntent().getStringExtra("date"));
+                    startActivityForResult(intent, REGISTRATION_REQUEST_CODE); // 화면이 자동으로 갱신되는가?
+                }
+            }
+        });
+    }
 
-        LinearLayout settingButton = new LinearLayout(this);
-        settingButton.setOrientation(LinearLayout.HORIZONTAL);
-        settingButton.setLayoutParams(defaultParams1);
-        settingButton.setPadding(130, 0, 0, 0);
-        Button modifyButton = new Button(this);
-        modifyButton.setText("수정버튼");
-        modifyButton.setLayoutParams(defaultParams2);
-        Button addButton = new Button(this);
-        addButton.setText("새로운 일정 추가");
-        defaultParams2.leftMargin = 20;
-        addButton.setLayoutParams(defaultParams2);
-        settingButton.addView(modifyButton);
-        settingButton.addView(addButton);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REGISTRATION_REQUEST_CODE) {
+            //해당 fragement의 화면 초기화.
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment,  fragment.getTag()).commit(); // 프래그먼트 재시작.
+        }
+    }
 
 
+    private void initToolbar() {
+        myToolbar = (Toolbar)findViewById(R.id.toolbar);
+        myToolbar.setTitle("");
+        setSupportActionBar(myToolbar);
+    }
 
-        block1.addView(scrollView);
-        block2.addView(settingButton);
-        block2.setPadding(0, 100, 0, 0); // 내부의 뷰에 이격을 둠.
+    private void initFragment() {
+        achieveAllListFragment = new AchieveAllListFragment();
+        scheduleAllModificationFragment = new ScheduleAllModificationFragment();
+        deleteAllSchedulesFragment = new DeleteAllSchedulesFragment();
+    }
 
-        // 2개의 레이아웃 부분을 등록. 윗화면 아래화면.
-        container.addView(block1);
-        container.addView(block2);
+    private long getLongDate(String date) {
+        date = date.replaceAll("[ :-]", "");
+        return Long.parseLong(date);
+    }
 
-        // 화면을 띄운다.
-        setContentView(container);
+
+    public void unregist(int deleteCode) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, Alarm_Receiver.class);
+        PendingIntent pIntent = PendingIntent.getBroadcast(this, deleteCode, intent, 0);
+        if(alarmManager != null) {
+            alarmManager.cancel(pIntent);
+        }
+        SharedPreferences preference = getPreferences(this);
+        SharedPreferences.Editor editor = preference.edit();
+        editor.remove(Integer.toString(deleteCode));
+        editor.apply();
+    }
+
+    private static SharedPreferences getPreferences(Context context) {
+        return context.getSharedPreferences("Alarm", Context.MODE_PRIVATE);
+    }
+
+    public void setFloatingActionButtonImgPlus() {
+        floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
     }
 }
