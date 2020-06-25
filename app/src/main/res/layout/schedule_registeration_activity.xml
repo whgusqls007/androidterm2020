@@ -4,17 +4,37 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme" >
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="일정 등록"
+            android:textColor="#FFFFFF"
+            android:textSize="30sp"/>
+    </androidx.appcompat.widget.Toolbar>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@drawable/cycle_selcet">
 
         <TextView
             android:id="@+id/textView2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="제목" />
+            android:text="제목"
+            android:textColor="@color/black"/>
 
         <EditText
             android:id="@+id/editTitle"
@@ -29,62 +49,88 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:orientation="horizontal">
+        android:layout_height="80sp"
+        android:orientation="horizontal"
+        android:background="@drawable/cycle_selcet">
 
         <TextView
             android:id="@+id/textView3"
-            android:layout_width="54dp"
+            android:layout_width="54sp"
             android:layout_height="wrap_content"
-            android:text="일정" />
+            android:text="일정"
+            android:textColor="@color/black"/>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/editScheduleStrDate"
-                android:layout_width="200sp"
-                android:layout_height="45sp"
-                android:gravity="center_horizontal"
-                android:hint="값이 없습니다."
-                android:text=""
-                android:textSize="22sp" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/editScheduleEndDate"
-                android:layout_width="200sp"
-                android:layout_height="45sp"
-                android:gravity="center_horizontal"
-                android:text=""
-                android:textSize="22sp"
-                android:hint="값이 없습니다."/>
+                <TextView
+                    android:id="@+id/editScheduleStrDate"
+                    android:layout_width="150sp"
+                    android:layout_height="35sp"
+                    android:gravity="center_horizontal"
+                    android:textSize="22sp"
+                    android:hint="Start Date"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/editScheduleStrTime"
+                    android:layout_width="150sp"
+                    android:layout_height="35sp"
+                    android:gravity="center_horizontal"
+                    android:textSize="22sp"
+                    android:hint="Start Time"
+                    android:textColor="@color/black"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/editScheduleEndDate"
+                    android:layout_width="150sp"
+                    android:layout_height="35sp"
+                    android:gravity="center_horizontal"
+                    android:textSize="22sp"
+                    android:hint="Due Date"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/editScheduleEndTime"
+                    android:layout_width="150sp"
+                    android:layout_height="35sp"
+                    android:gravity="center_horizontal"
+                    android:textSize="22sp"
+                    android:hint="Due Time"
+                    android:textColor="@color/black"/>
+            </LinearLayout>
         </LinearLayout>
 
-        <Button
-            android:id="@+id/aa"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="종료일 선택"
-            android:layout_marginTop="40dp"
-            android:layout_marginRight="10dp"/>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@drawable/cycle_selcet">
 
         <TextView
             android:id="@+id/textView5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.5"
-            android:text="세부내용" />
+            android:text="세부내용"
+            android:textColor="@color/black"/>
 
         <EditText
             android:id="@+id/editDetails"
@@ -98,45 +144,40 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/select"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@drawable/cycle_selcet">
 
         <TextView
-            android:id="@+id/textView6"
-            android:layout_width="0dp"
+            android:id="@+id/select_cycle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="주기" />
+            android:layout_gravity="start|left"
+            android:text="반복"
+            android:textColor="@color/black"/>
 
-        <CheckBox
-            android:id="@+id/checkBox"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/select_view"
+            android:layout_width="30sp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="주간" />
-
-        <CheckBox
-            android:id="@+id/checkBox2"
-            android:layout_width="0dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text="" />
+        <TextView
+            android:id="@+id/select_cycle_text"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="격일" />
-
-        <CheckBox
-            android:id="@+id/checkBox3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:text="반복" />
+            android:gravity="right"
+            android:text=">     "
+            android:layout_weight="1"
+            android:textSize="20sp"
+            />
 
     </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/testText"
-        android:text="test"/>
     <Button
         android:id="@+id/regBtn"
         android:layout_width="match_parent"
@@ -144,32 +185,6 @@
         android:layout_marginTop="40dp"
         android:text="일정등록" />
 
-    <Button
-        android:id="@+id/selectBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="등록된 데이터 조회" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/textView12"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="테스트용" />
-
-            <TextView
-                android:id="@+id/logTxt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-    </ScrollView>
 
 </LinearLayout>

@@ -1,6 +1,7 @@
 package com.example.androidterm2020;
 
 import android.annotation.SuppressLint;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -8,8 +9,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
+
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.androidterm2020.RoomDB.Schedule;
@@ -17,13 +21,17 @@ import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class ScheduleUpdateActivity extends AppCompatActivity {
     EditText title;
     TextView scheduleStrDate;
     TextView scheduleEndDate;
+    TextView scheduleStrTime;
+    TextView scheduleEndTime;
     EditText details;
+    TextView toolbarTitle;
     int period = 0; // 나중에 checkbox와 연동되도록 코드를 추가해주자.
     TextView testLog;
     Schedule schedule;
@@ -44,38 +52,45 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
         title = (EditText) findViewById(R.id.editTitle);
         scheduleStrDate = (TextView) findViewById(R.id.editScheduleStrDate);
         scheduleEndDate = (TextView) findViewById(R.id.editScheduleEndDate);
+        scheduleStrTime = (TextView) findViewById(R.id.editScheduleStrTime);
+        scheduleEndTime = (TextView) findViewById(R.id.editScheduleEndTime);
         details = (EditText) findViewById(R.id.editDetails);
-        testLog = (TextView) findViewById(R.id.logTxt); // 임시로 이용하는 로그 비슷한 기능담당할 놈.
+        toolbarTitle = (TextView)findViewById(R.id.toolbar_title);
+        toolbarTitle.setText("일정 수정");
 
-        final CheckBox checkBox = (CheckBox) findViewById(R.id.checkBox);
-        final CheckBox checkBox2 = (CheckBox) findViewById(R.id.checkBox2);
-        final CheckBox checkBox3 = (CheckBox) findViewById(R.id.checkBox3);
-
-        scheduleStrDate.setOnClickListener(new View.OnClickListener() {
+        scheduleStrTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TimePickerFragment timePickerFragment = new TimePickerFragment();
-
-                Bundle bundle = new Bundle();
-                // sql의 datetime에서 뒷부분인 시간을 bundle에 넣음.
-                bundle.putString("time", scheduleStrDate.getText().toString().split(" ")[1]);
-                bundle.putBoolean("is_start", true);
-                timePickerFragment.setArguments(bundle);
-                timePickerFragment.show(getSupportFragmentManager(), "TimePicker");
+                Calendar mcurrentTime = Calendar.getInstance();
+                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+                int minute = mcurrentTime.get(Calendar.MINUTE);
+                TimePickerDialog mTimePicker;
+                mTimePicker = new TimePickerDialog(ScheduleUpdateActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                        scheduleStrTime.setText(selectedHour + ":" + selectedMinute);
+                    }
+                }, hour, minute, false); // true의 경우 24시간 형식의 TimePicker 출현
+                mTimePicker.setTitle("Select Time");
+                mTimePicker.show();
             }
         });
 
-        scheduleEndDate.setOnClickListener(new View.OnClickListener() {
+        scheduleEndTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TimePickerFragment timePickerFragment = new TimePickerFragment();
-
-                Bundle bundle = new Bundle();
-                // sql의 datetime에서 뒷부분인 시간을 bundle에 넣음.
-                bundle.putString("time", scheduleEndDate.getText().toString().split(" ")[1]);
-                bundle.putBoolean("is_start", false);
-                timePickerFragment.setArguments(bundle);
-                timePickerFragment.show(getSupportFragmentManager(), "TimePicker");
+                Calendar mcurrentTime = Calendar.getInstance();
+                int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+                int minute = mcurrentTime.get(Calendar.MINUTE);
+                TimePickerDialog mTimePicker;
+                mTimePicker = new TimePickerDialog(ScheduleUpdateActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                        scheduleEndTime.setText(selectedHour + ":" + selectedMinute);
+                    }
+                }, hour, minute, false); // true의 경우 24시간 형식의 TimePicker 출현
+                mTimePicker.setTitle("Select Time");
+                mTimePicker.show();
             }
         });
 
@@ -89,53 +104,11 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
 
         String strDate = getDateTime(schedule.getStrDate());
         String endDate = getDateTime(schedule.getEndDate());
-        scheduleStrDate.setText(strDate);
-        scheduleEndDate.setText(endDate);
+        scheduleStrDate.setText(strDate.split(" ")[0]);
+        scheduleEndTime.setText(endDate.split(" ")[1]);
+        scheduleStrTime.setText(strDate.split(" ")[1]);
+        scheduleEndDate.setText(endDate.split(" ")[0]);
 
-        if (period == 0) {
-            checkBox.setChecked(true);
-        }
-        else if (period == 1) {
-            checkBox2.setChecked(true);
-        }
-        else {
-            checkBox3.setChecked(true);
-        }
-
-
-        checkBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(checkBox.isChecked() == true) {
-                    checkBox2.setChecked(false);
-                    checkBox3.setChecked(false);
-                    period = 0;
-                }
-            }
-        });
-
-
-        checkBox2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(checkBox2.isChecked() == true) {
-                    checkBox.setChecked(false);
-                    checkBox3.setChecked(false);
-                    period = 1;
-                }
-            }
-        });
-
-        checkBox3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(checkBox3.isChecked() == true) {
-                    checkBox.setChecked(false);
-                    checkBox2.setChecked(false);
-                    period = 2;
-                }
-            }
-        });
 
         Button updateBtn = (Button) findViewById(R.id.regBtn);
         updateBtn.setOnClickListener(new View.OnClickListener() { // update버튼.
@@ -147,40 +120,31 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
             }
         });
 
-        Button button = (Button) findViewById(R.id.aa);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent2 = new Intent(getApplicationContext(), PickDActivity.class);
-                intent2.putExtra("cur_date", getDateTime(schedule.getStrDate()));
-                startActivityForResult(intent2, 101);
-            }
-        });
     }
 
     public void updateSchedule() {
         schedule.setAchievementData(updateAchievementData());
         schedule.setTitle(title.getText().toString());
-        schedule.setStrDate(getLongDate(scheduleStrDate.getText().toString()));
-        schedule.setEndDate(getLongDate(scheduleEndDate.getText().toString()));
+        schedule.setStrDate(getLongDate(scheduleStrDate.getText().toString() + " " + scheduleStrTime.getText().toString()));
+        schedule.setEndDate(getLongDate(scheduleEndDate.getText().toString() + " " + scheduleEndTime.getText().toString()));
         schedule.setDetails(details.getText().toString());
         schedule.setPeriod(period);
 
 
-        schedule.setDateNum(calDate(scheduleStrDate.getText().toString(), scheduleEndDate.getText().toString()));
+        schedule.setDateNum(calDate(scheduleStrDate.getText().toString() + " " + scheduleStrTime.getText().toString(), scheduleEndDate.getText().toString() + " " + scheduleEndTime.getText().toString()));
 
         scheduleViewModel.updateSchedule(schedule);
     }
 
     private String updateAchievementData() {
-        int newDateNum = calDate(scheduleStrDate.getText().toString(), scheduleEndDate.getText().toString());
+        int newDateNum = calDate(scheduleStrDate.getText().toString() + " " + scheduleStrTime.getText().toString(), scheduleEndDate.getText().toString() + " " + scheduleEndTime.getText().toString());
         String data = "";
         if(schedule.getAchievementData().length() < newDateNum) { // 날의 일 수 가 증가하면
             // 1. 시작날짜 그대로일 경우
             // 2. 시작일이 변한경우
             data = schedule.getAchievementData();
             int dateNum = schedule.getDateNum();
-            if(schedule.getStrDate() == getLongDate(scheduleStrDate.getText().toString())) { // 시작일 그대로면 바로 뒤에 0을 추가함 증가한 만큼 111 -> 111000
+            if(schedule.getStrDate() == getLongDate(scheduleStrDate.getText().toString() + " " + scheduleStrTime.getText().toString())) { // 시작일 그대로면 바로 뒤에 0을 추가함 증가한 만큼 111 -> 111000
                 for (int i = 0; i < (newDateNum-dateNum); ++i) {
                     data += "0";
                 }
@@ -246,16 +210,6 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n")
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 101) {
-
-            String date = data.getStringExtra("date");
-            TextView textView = (TextView) findViewById(R.id.editScheduleEndDate);
-            textView.setText(date + ' ' + getCurrentTime());
-        }
-    }
 
     private String getCurrentTime() {
         long now = System.currentTimeMillis(); // 현재시간 가져옴.

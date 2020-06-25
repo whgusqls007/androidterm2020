@@ -71,9 +71,6 @@ public class MainActivity extends AppCompatActivity {
     String addressString;
     boolean settingInfo;
 
-    TextView textview_address;
-    EditText textview_Latitude;
-    EditText textview_Longitude;
 
     List<Schedule> mAllSchedule;
 
@@ -96,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
 
         setCalendar();
         // 임시버튼들, 나중에 다 지워야함. xml도 수정해야함.
-        setTempButtons();
 
         // 사이드 매뉴 담당
         setListView();
@@ -121,9 +117,7 @@ public class MainActivity extends AppCompatActivity {
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         settingInfo = prefs.getBoolean("notify_on_off", true);
         // gps 관련
-        textview_address = (TextView)findViewById(R.id.textview);
-        textview_Latitude = (EditText)findViewById(R.id.Ed1);
-        textview_Longitude = (EditText)findViewById(R.id.Ed2);
+
         /*SharedPreferences pref = getPreferences(this);
         SharedPreferences.Editor editor = pref.edit();
         editor.clear();
@@ -133,13 +127,7 @@ public class MainActivity extends AppCompatActivity {
         longitude = gpsTracker.getLongitude();
 
         addressString = getCurrentAddress(latitude, longitude);
-        if(settingInfo) {
-            textview_address.setText("True");
-        }else{
-            textview_address.setText("False");
-        }
-        textview_Latitude.setText(Double.toString(latitude));
-        textview_Longitude.setText(Double.toString(longitude));
+
 
         Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
         GetWeatherData(latitude, longitude);
@@ -244,24 +232,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setTempButtons() {
-        Button button = (Button) findViewById(R.id.tempB);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent2 = new Intent(getApplicationContext(), ShowDetail.class);
-                startActivity(intent2);
-            }
-        });
-        Button button1 = (Button) findViewById(R.id.tempB1);
-        button1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent3 = new Intent(getApplicationContext(), Achieve.class);
-                startActivity(intent3);
-            }
-        });
-    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
@@ -456,9 +427,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     protected void GetWeatherData(double lan, double lon){
         String[] resultText = new String[5];
-        TextView weather = (TextView)findViewById(R.id.weather);
-        TextView weather2 = (TextView)findViewById(R.id.weather2);
-        TextView weather3 = (TextView)findViewById(R.id.weather3);
+//        TextView weather = (TextView)findViewById(R.id.weather);
         try{
             resultText = new ReceiveWeatherTask(lan, lon).execute().get();
         } catch (InterruptedException e) {
@@ -466,9 +435,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-        weather.setText(resultText[0].toString());
-        weather2.setText(resultText[1].toString());
-        weather3.setText("현재온도 : " + resultText[2] + ", 최고온도 : " + resultText[4] + ", 최저온도 : " + resultText[3]);
+//        weather.setText(resultText[0].toString());
+//        weather2.setText(resultText[1].toString());
+//        weather3.setText("현재온도 : " + resultText[2] + ", 최고온도 : " + resultText[4] + ", 최저온도 : " + resultText[3]);
 
     }
 
