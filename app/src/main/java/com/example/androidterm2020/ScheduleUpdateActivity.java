@@ -1,24 +1,23 @@
 package com.example.androidterm2020;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
-import org.w3c.dom.Text;
+import com.example.androidterm2020.RoomDB.Schedule;
+import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ScheduleUpdateActivity extends AppCompatActivity {
     EditText title;
@@ -27,18 +26,20 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
     EditText details;
     int period = 0; // 나중에 checkbox와 연동되도록 코드를 추가해주자.
     TextView testLog;
+    Schedule schedule;
+
+    private ScheduleViewModel scheduleViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.schedule_registeration_activity);
         Intent intent = getIntent();
-        final int ID = intent.getIntExtra("ID", 0);
+        final int ID = intent.getIntExtra("sid", 0);
 
         Button regBtn = (Button) findViewById(R.id.regBtn);
         regBtn.setText("수정된 정보 업데이트");
-
-        Cursor cursor = getContentResolver().query(ScheduleProvider.CONTENT_URI, DBHelper.ALL_COLUMNS, DBHelper.SCHEDULE_ID + " = " + ID, null, null);
+        scheduleViewModel = new ViewModelProvider(this).get(ScheduleViewModel.class);
 
         title = (EditText) findViewById(R.id.editTitle);
         scheduleStrDate = (TextView) findViewById(R.id.editScheduleStrDate);
@@ -78,33 +79,29 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
             }
         });
 
-        SimpleDateFormat stringToDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); // yyyy-MM-dd hh:mm:ss가 datetime 타입에 딱 알맞다.
         SimpleDateFormat dateToString = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         // 값이 있으면 기존의 값을 입력해즌다.
-        if (cursor.getCount() > 0) {
-            cursor.moveToNext();
-            title.setText(cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_TITLE)));
-            details.setText(cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_DETAILS)));
-            period = cursor.getInt(cursor.getColumnIndex(DBHelper.SCHEDULE_PERIOD));
 
-            String strDate = cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_START_DATE));
-            String endDate = cursor.getString(cursor.getColumnIndex(DBHelper.SCHEDULE_END_DATE));
-            try {
-                scheduleStrDate.setText(dateToString.format(stringToDate.parse(strDate)));
-                scheduleEndDate.setText(dateToString.format(stringToDate.parse(endDate)));
-            }
-            catch (Exception e) {}
+        schedule = scheduleViewModel.getScheduleById(ID);
+        title.setText(schedule.getTitle());
+        details.setText(schedule.getDetails());
+        period = schedule.getPeriod();
 
-            if (period == 0) {
-                checkBox.setChecked(true);
-            }
-            else if (period == 1) {
-                checkBox2.setChecked(true);
-            }
-            else {
-                checkBox3.setChecked(true);
-            }
+        String strDate = getDateTime(schedule.getStrDate());
+        String endDate = getDateTime(schedule.getEndDate());
+        scheduleStrDate.setText(strDate);
+        scheduleEndDate.setText(endDate);
+
+        if (period == 0) {
+            checkBox.setChecked(true);
         }
+        else if (period == 1) {
+            checkBox2.setChecked(true);
+        }
+        else {
+            checkBox3.setChecked(true);
+        }
+
 
         checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,23 +142,127 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 업데이트 쿼리문.
-                updateSchedule(ID);
+                updateSchedule();
                 finish();
+            }
+        });
+
+        Button button = (Button) findViewById(R.id.aa);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent2 = new Intent(getApplicationContext(), PickDActivity.class);
+                intent2.putExtra("cur_date", getDateTime(schedule.getStrDate()));
+                startActivityForResult(intent2, 101);
             }
         });
     }
 
-    public void updateSchedule(final int ID) {
-        Uri uri = ScheduleProvider.CONTENT_URI;
+    public void updateSchedule() {
+        schedule.setAchievementData(updateAchievementData());
+        schedule.setTitle(title.getText().toString());
+        schedule.setStrDate(getLongDate(scheduleStrDate.getText().toString()));
+        schedule.setEndDate(getLongDate(scheduleEndDate.getText().toString()));
+        schedule.setDetails(details.getText().toString());
+        schedule.setPeriod(period);
 
-        String selection = DBHelper.SCHEDULE_ID + " = " + ID;
-        ContentValues updateValue = new ContentValues();
-        updateValue.put(DBHelper.SCHEDULE_TITLE, title.getText().toString());
-        updateValue.put(DBHelper.SCHEDULE_START_DATE, scheduleStrDate.getText().toString());
-        updateValue.put(DBHelper.SCHEDULE_END_DATE, scheduleEndDate.getText().toString());
-        updateValue.put(DBHelper.SCHEDULE_DETAILS, details.getText().toString());
-        updateValue.put(DBHelper.SCHEDULE_PERIOD, period);
 
-        int count = getContentResolver().update(uri, updateValue, selection, null);
+        schedule.setDateNum(calDate(scheduleStrDate.getText().toString(), scheduleEndDate.getText().toString()));
+
+        scheduleViewModel.updateSchedule(schedule);
+    }
+
+    private String updateAchievementData() {
+        int newDateNum = calDate(scheduleStrDate.getText().toString(), scheduleEndDate.getText().toString());
+        String data = "";
+        if(schedule.getAchievementData().length() < newDateNum) { // 날의 일 수 가 증가하면
+            // 1. 시작날짜 그대로일 경우
+            // 2. 시작일이 변한경우
+            data = schedule.getAchievementData();
+            int dateNum = schedule.getDateNum();
+            if(schedule.getStrDate() == getLongDate(scheduleStrDate.getText().toString())) { // 시작일 그대로면 바로 뒤에 0을 추가함 증가한 만큼 111 -> 111000
+                for (int i = 0; i < (newDateNum-dateNum); ++i) {
+                    data += "0";
+                }
+            }
+            else { // 초기화 하고 DateNum 만큼 만들어준다.
+                data = "0";
+                for (int i = 0; i < newDateNum -1; ++i) {
+                    data += "0";
+                }
+            }
+        }
+
+        return data;
+    }
+
+    private int calDate(String date1, String date2) {
+        int calDateDays = -1;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        Date strDate = null;
+        Date endDate = null;
+        try {
+            strDate = dateFormat.parse(date1);
+            endDate = dateFormat.parse(date2);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+        if( date1 != null && date2 != null)  {
+            long calDate = endDate.getTime() - strDate.getTime();
+            calDateDays = (int)Math.abs(calDate / (24 * 60 * 60 * 1000));
+        }
+        return calDateDays + 1;
+    }
+
+    private String getDateTime(long strDate) { // 20200623 1122 에서 1122만 가져온다.
+        String result = "";
+
+        for(int i=0; i<4; ++i) {
+            result += (strDate%10); // 2211
+            strDate /= 10;
+            if(i == 1) {
+                result += ":";
+            }
+        }
+        // 만약 보기 안좋으면 여기에서 뉴라인 추가
+        result += " ";
+        for(int i=0; i<8; ++i) {
+            result += (strDate%10); // 2211
+            strDate /= 10;
+            if(i%2 == 1 && i < 5) {
+                result += "-";
+            }
+        }
+        result = (new StringBuffer(result)).reverse().toString(); //20/06/23 11:22
+
+        return result;
+    }
+
+    private long getLongDate(String date) {
+        date = date.replaceAll("[ :-]", "");
+        return Long.parseLong(date);
+    }
+
+    @SuppressLint("SetTextI18n")
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 101) {
+
+            String date = data.getStringExtra("date");
+            TextView textView = (TextView) findViewById(R.id.editScheduleEndDate);
+            textView.setText(date + ' ' + getCurrentTime());
+        }
+    }
+
+    private String getCurrentTime() {
+        long now = System.currentTimeMillis(); // 현재시간 가져옴.
+        Date mDate = new Date(now); // Date 타입으로 바꿈.
+        SimpleDateFormat simpleDate = new SimpleDateFormat("hh:mm"); // yyyy-MM-dd hh:mm:ss가 datetime 타입에 딱 알맞다.
+        String getTime = simpleDate.format(mDate);
+
+        return getTime;
     }
 }

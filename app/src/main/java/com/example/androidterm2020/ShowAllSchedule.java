@@ -1,19 +1,14 @@
 package com.example.androidterm2020;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 public class ShowAllSchedule extends AppCompatActivity {
-    DBHelper dbHelper;
-    SQLiteDatabase database;
-    String dbName = "test2.db";
-    String tableName = "test_tb";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

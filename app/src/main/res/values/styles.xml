@@ -9,4 +9,6 @@
 
     </style>
 
+    <style name="AppTheme.AppBarOverlay"></style>
+
 </resources>

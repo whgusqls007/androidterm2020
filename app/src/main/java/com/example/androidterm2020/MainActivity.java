@@ -1,6 +1,7 @@
 package com.example.androidterm2020;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -10,6 +11,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -22,7 +26,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -37,7 +40,6 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
@@ -45,7 +47,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.androidterm2020.RoomDB.Schedule;
+import com.example.androidterm2020.RoomDB.ScheduleViewModel;
+import com.facebook.stetho.Stetho;
+
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
@@ -59,32 +66,80 @@ public class MainActivity extends AppCompatActivity {
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    double latitude;
+    double longitude;
+    String addressString;
+    boolean settingInfo;
 
+    TextView textview_address;
+    EditText textview_Latitude;
+    EditText textview_Longitude;
+
+    List<Schedule> mAllSchedule;
+
+    String date;
+
+    ScheduleViewModel scheduleViewModel;
+    // 달력
+    CalendarView calendar;
     @RequiresApi(api = Build.VERSION_CODES.O)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Stetho.initializeWithDefaults(this);
+        // 오늘날짜를 가져와야함. 해당일의 일정을 check하기 위함.
+        setScheduleViewModel();
+
+        setGps();
+
+        setToolbar();
+
+        setCalendar();
+        // 임시버튼들, 나중에 다 지워야함. xml도 수정해야함.
+        setTempButtons();
+
+        // 사이드 매뉴 담당
+        setListView();
+        // 하루가 바뀌면 해야할 것이 2가지 있다.
+        // 1. 지난날의 기록 삭제
+        // 2. 오늘의 일정을 알람 매니저에 등록. -> 다중 알람 기능.
+        // 그리고 폰을 껐다 킨 경우 해야할 것이 있다.
+        // 1. 폰을 다시 키면서 알람을 다시 등록. // 끄고나면 알람이 사라지기 때문...
+    }
+
+    private void setScheduleViewModel() {
+        date = getTodayDate();
+        scheduleViewModel = new ViewModelProvider(this).get(ScheduleViewModel.class);
+        scheduleViewModel.getAllSchedules().observe(this, new Observer<List<Schedule>>() {
+            @Override
+            public void onChanged(@Nullable final List<Schedule> schedules) {
+                mAllSchedule = schedules;
+            }
+        });
+    }
+
+    private void setGps() {
         if (!checkLocationServicesStatus()) {
             showDialogForLocationServiceSetting();
         }else {
             checkRunTimePermission();
         }
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean settinginfo = prefs.getBoolean("notify_on_off", true);
+        settingInfo = prefs.getBoolean("notify_on_off", true);
         // gps 관련
-        final TextView textview_address = (TextView)findViewById(R.id.textview);
-        final EditText textview_Latitude = (EditText)findViewById(R.id.Ed1);
-        final EditText textview_Longitude = (EditText)findViewById(R.id.Ed2);
+        textview_address = (TextView)findViewById(R.id.textview);
+        textview_Latitude = (EditText)findViewById(R.id.Ed1);
+        textview_Longitude = (EditText)findViewById(R.id.Ed2);
         /*SharedPreferences pref = getPreferences(this);
         SharedPreferences.Editor editor = pref.edit();
         editor.clear();
         editor.commit();*/
         gpsTracker = new GpsTracker(MainActivity.this);
-        final double latitude = gpsTracker.getLatitude();
-        final double longitude = gpsTracker.getLongitude();
+        latitude = gpsTracker.getLatitude();
+        longitude = gpsTracker.getLongitude();
 
-        String address = getCurrentAddress(latitude, longitude);
-        if(settinginfo) {
+        addressString = getCurrentAddress(latitude, longitude);
+        if(settingInfo) {
             textview_address.setText("True");
         }else{
             textview_address.setText("False");
@@ -94,76 +149,9 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
         GetWeatherData(latitude, longitude);
-        Button ShowLocationButton = (Button) findViewById(R.id.button);
-        /*ShowLocationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), SetAlarm.class);
-                startActivity(intent);
-            }*/
-            /*@SuppressLint("SetTextI18n")
-            @Override
-            public void onClick(View arg0)
-            {
+    }
 
-                gpsTracker = new GpsTracker(MainActivity.this);
-
-                final double latitude = gpsTracker.getLatitude();
-                final double longitude = gpsTracker.getLongitude();
-
-                String address = getCurrentAddress(latitude, longitude);
-                textview_address.setText(address);
-                textview_Latitude.setText(Double.toString(latitude));
-                textview_Longitude.setText(Double.toString(longitude));
-
-                Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
-                GetWeatherData(latitude, longitude);
-            }
-        });*/
-
-        myToolbar = (Toolbar)findViewById(R.id.toolbar);
-        setSupportActionBar(myToolbar);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);//기본버튼추가
-        actionBar.setHomeAsUpIndicator(R.drawable.menu);//이미지 바꾸기, drawable에 이미지 추가 필요
-
-        CalendarView calendar = (CalendarView)findViewById(R.id.calendar);
-        calendar.setWeekSeparatorLineColor(Color.BLACK);
-        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int DayOfMonth) {
-                String date = year  + "-" + (month > 9 ? "" : "0") + (month+1) + "-" + (DayOfMonth > 9 ? "" : "0") + DayOfMonth;
-                Cursor cursor = getContentResolver().query(ScheduleProvider.CONTENT_URI, DBHelper.ALL_COLUMNS, "date(" + DBHelper.SCHEDULE_START_DATE + ") = ?", new String[] {date}, DBHelper.SCHEDULE_START_DATE + " ASC");
-                Intent intent = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
-
-                if (cursor.getCount() > 0) {
-                    intent = new Intent(getApplicationContext(), ShowDetail.class);
-                }
-
-                intent.putExtra("date", date);
-                startActivity(intent);
-            }
-        });
-
-        // 임시버튼들, 나중에 다 지워야함. xml도 수정해야함.
-        Button button = (Button) findViewById(R.id.tempB);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent2 = new Intent(getApplicationContext(), ShowDetail.class);
-                startActivity(intent2);
-            }
-        });
-        Button button1 = (Button) findViewById(R.id.tempB1);
-        button1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent3 = new Intent(getApplicationContext(), Achieve.class);
-                startActivity(intent3);
-            }
-        });
-
-        // 사이드 매뉴 담당
+    private void setListView() {
         adapter = new ListViewAdapter();
 
         listView = (ListView)findViewById(R.id.drawer_menu);
@@ -176,8 +164,8 @@ public class MainActivity extends AppCompatActivity {
         //adapter.addItem(ContextCompat.getDrawable(this, R.drawable.gasmask), "나쁨");
         //먼지에 따라 그림이 바뀐다.
         String[] AirData = GetAirData();
-        int pm25value = Integer.parseInt(AirData[0]);
-        int pm10value = Integer.parseInt(AirData[1]);
+        int pm25value = Integer.parseInt(!AirData[0].equals("-") ? AirData[0] : "0");
+        int pm10value = Integer.parseInt(!AirData[1].equals("-") ? AirData[1] : "0");
 
         if(pm25value <= 15 || pm10value <= 30){
             adapter.addItem(ContextCompat.getDrawable(this, R.drawable.good), "미세먼지 없음");
@@ -187,11 +175,9 @@ public class MainActivity extends AppCompatActivity {
         }
         else if((pm25value > 35 && pm25value <= 75) || (pm10value > 80 && pm10value < 150)){
             adapter.addItem(ContextCompat.getDrawable(this, R.drawable.gasmask), "미세먼지 나쁨");
-            MaskNotification();
         }
         else if((pm25value > 75) || (pm10value > 150)){
             adapter.addItem(ContextCompat.getDrawable(this, R.drawable.skull), "미세먼지 매우 나쁨");
-            MaskNotification();
         }
 
         adapter.addItem("종료");
@@ -234,11 +220,53 @@ public class MainActivity extends AppCompatActivity {
                 drawer.closeDrawer(Gravity.LEFT);
             }
         });
-        // 하루가 바뀌면 해야할 것이 2가지 있다.
-        // 1. 지난날의 기록 삭제
-        // 2. 오늘의 일정을 알람 매니저에 등록. -> 다중 알람 기능.
-        // 그리고 폰을 껐다 킨 경우 해야할 것이 있다.
-        // 1. 폰을 다시 키면서 알람을 다시 등록. // 끄고나면 알람이 사라지기 때문...
+    }
+
+    private void setToolbar() {
+        myToolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);//기본버튼추가
+        actionBar.setHomeAsUpIndicator(R.drawable.menu);//이미지 바꾸기, drawable에 이미지 추가 필요
+    }
+
+    private void setCalendar() {
+        calendar = (CalendarView)findViewById(R.id.calendar);
+        calendar.setWeekSeparatorLineColor(Color.BLACK);
+        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int DayOfMonth) {
+                date = year  + "-" + (month > 9 ? "" : "0") + (month+1) + "-" + (DayOfMonth > 9 ? "" : "0") + DayOfMonth;
+                // 값으로 가져와야함.
+                int count = scheduleViewModel.getDateCountedSchedules(getLongDate(date + "0000"));
+                Intent intent = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
+                if(count > 0) {
+                    intent = new Intent(getApplicationContext(), ShowDetail.class);
+                }
+
+                intent.putExtra("date", date);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void setTempButtons() {
+        Button button = (Button) findViewById(R.id.tempB);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent2 = new Intent(getApplicationContext(), ShowDetail.class);
+                startActivity(intent2);
+            }
+        });
+        Button button1 = (Button) findViewById(R.id.tempB1);
+        button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent3 = new Intent(getApplicationContext(), Achieve.class);
+                startActivity(intent3);
+            }
+        });
     }
 
     @Override
@@ -462,38 +490,28 @@ public class MainActivity extends AppCompatActivity {
         return resultText;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public void MaskNotification() {
-
-        Bitmap mLargeIconForNoti = BitmapFactory.decodeResource(getResources(),R.drawable.mask);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(MainActivity.this, 0,
-                new Intent(getApplicationContext(),MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-
-
-        NotificationManager nm = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-
-
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(MainActivity.this, "CHANNEL_ID")
-                        .setSmallIcon(R.drawable.mask)
-                        .setContentTitle("마스크 챙기세요!")
-                        .setContentText("미세먼지가 심해요!")
-                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                        .setLargeIcon(mLargeIconForNoti)
-                        .setAutoCancel(true)
-                        .setDefaults(Notification.DEFAULT_ALL)
-                        .setContentIntent(contentIntent);
-
-        NotificationChannel channel = new NotificationChannel("CHANNEL_ID", "name", nm.IMPORTANCE_DEFAULT);
-        channel.setDescription("description");
-        // Register the channel with the system; you can't change the importance
-        // or other notification behaviors after this
-
-        nm.createNotificationChannel(channel);
-        nm.notify(5678, builder.build());
-    }
     private static SharedPreferences getPreferences(Context context) {
         return context.getSharedPreferences("Alarm", Context.MODE_PRIVATE);
     }
+
+    private long getLongDate(String date) {
+        date = date.replaceAll("[ :-]", "");
+        return Long.parseLong(date);
+    }
+
+    private String getTodayDate() {
+        Calendar cal = Calendar.getInstance();
+
+        int year = cal.get( cal.YEAR );
+        int month = cal.get( cal.MONTH ) + 1 ;
+        int DayOfMonth = cal.get( cal.DATE ) ;
+
+        String result = year
+                + "-" + (month > 9 ? "" : "0") + month
+                + "-" + (DayOfMonth > 9 ? "" : "0")
+                + DayOfMonth;
+
+        return result;
+    }
+
 }

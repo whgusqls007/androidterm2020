@@ -1,35 +1,19 @@
 package com.example.androidterm2020;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 import java.util.concurrent.ExecutionException;
-
-import static androidx.core.content.ContextCompat.getSystemService;
-
-import static android.content.Context.MODE_PRIVATE;
 
 public class Alarm_Receiver extends BroadcastReceiver {
     GpsTracker gpsTracker;
@@ -59,7 +43,7 @@ public class Alarm_Receiver extends BroadcastReceiver {
 
 
         //OREO API 26 이상에서는 채널 필요
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             builder.setSmallIcon(R.drawable.ic_launcher_foreground); //mipmap 사용시 Oreo 이상에서 시스템 UI 에러남
 
@@ -156,7 +140,7 @@ public class Alarm_Receiver extends BroadcastReceiver {
 
 
         //OREO API 26 이상에서는 채널 필요
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             builder.setSmallIcon(R.drawable.ic_launcher_foreground); //mipmap 사용시 Oreo 이상에서 시스템 UI 에러남
 

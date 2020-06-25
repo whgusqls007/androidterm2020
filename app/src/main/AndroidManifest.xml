@@ -41,12 +41,6 @@
             </intent-filter>
         </activity>
 
-        <provider
-            android:name=".ScheduleProvider"
-            android:authorities="com.example.androidterm2020"
-            android:exported="true"
-            android:readPermission="com.example.androidterm2020.READ_DATABASE"
-            android:writePermission="com.example.androidterm2020.WRITE_DATABASE" />
     </application>
 
 </manifest>
