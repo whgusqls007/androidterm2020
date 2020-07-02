@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.androidterm2020.Fragments.AchieveAllListFragment;
 import com.example.androidterm2020.Fragments.DeleteAllSchedulesFragment;
-import com.example.androidterm2020.Fragments.FragmentCallback;
+import com.example.androidterm2020.Fragments.DeleteSchedulesFragment;
 import com.example.androidterm2020.Fragments.ScheduleAllModificationFragment;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
@@ -61,11 +61,6 @@ public class ShowAllSchedule extends AppCompatActivity implements NavigationView
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        View headerView = navigationView.getHeaderView(0);
-        TextView time = (TextView) headerView.findViewById(R.id.todayDatetime);
-        time.setText(date); // 여기가 사이드바의 시간부분에 넣는 곳이다.
 
         final Bundle bundle = new Bundle();
         bundle.putString("date", date); // 번들을 잘 넘김.
@@ -140,17 +135,32 @@ public class ShowAllSchedule extends AppCompatActivity implements NavigationView
     private void init() {
         initToolbar();
         initFragment();
+        initViews();
+    }
+
+    private void initViews() {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.getHeaderView(0);
+        TextView title = (TextView) headerView.findViewById(R.id.Title);
+        TextView time = (TextView) headerView.findViewById(R.id.todayDatetime);
+
+        title.setText("전체 일정");
+        time.setHint("");
+
         floatingActionButton = findViewById(R.id.floatingActionButton);
         floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
-                if(fragment instanceof DeleteAllSchedulesFragment && ((DeleteAllSchedulesFragment) fragment).getScheduleNum() > 0) {
-                        Toast.makeText(getApplicationContext(), "일정삭제", Toast.LENGTH_SHORT).show();
-                        ((DeleteAllSchedulesFragment) fragment).deleteSchedules();
-                        onFragmentSelected(0, null);
-                        onFragmentSelected(2, null);
+                if(fragment instanceof DeleteSchedulesFragment && ((DeleteSchedulesFragment) fragment).getScheduleNum() > 0) {
+                    Toast.makeText(getApplicationContext(), "일정삭제", Toast.LENGTH_SHORT).show();
+                    DeleteSchedulesFragment delFrag = (DeleteSchedulesFragment)getSupportFragmentManager().findFragmentByTag("delete");
+                    delFrag.deleteSchedules();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("date", date);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, delFrag.getClass(), bundle, delFrag.getTag()).commit();
                 }
                 else {
                     Toast.makeText(getApplicationContext(), "일정등록", Toast.LENGTH_SHORT).show();

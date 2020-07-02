@@ -27,7 +27,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.androidterm2020.Fragments.AchieveListFragment;
 import com.example.androidterm2020.Fragments.DeleteSchedulesFragment;
-import com.example.androidterm2020.Fragments.FragmentCallback;
+import com.example.androidterm2020.FragmentCallback;
 import com.example.androidterm2020.Fragments.ScheduleModificationFragment;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
@@ -71,11 +71,6 @@ public class ShowDetail extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        View headerView = navigationView.getHeaderView(0);
-        TextView time = (TextView) headerView.findViewById(R.id.todayDatetime);
-        time.setText(date); // 여기가 사이드바의 시간부분에 넣는 곳이다.
 
         final Bundle bundle = new Bundle();
         date += " 00:00";
@@ -151,6 +146,28 @@ public class ShowDetail extends AppCompatActivity
     private void init() {
         initToolbar();
         initFragment();
+        initViews();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REGISTRATION_REQUEST_CODE) {
+            //해당 fragement의 화면 초기화.
+            Bundle bundle = new Bundle();
+            bundle.putString("date", date);
+            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment.getClass(), bundle, fragment.getTag()).commit(); // 프래그먼트 재시작.
+        }
+    }
+
+    private void initViews() {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.getHeaderView(0);
+        TextView time = (TextView) headerView.findViewById(R.id.todayDatetime);
+        time.setText(date); // 여기가 사이드바의 시간부분에 넣는 곳이다.
+
         floatingActionButton = findViewById(R.id.floatingActionButton);
         floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -173,18 +190,6 @@ public class ShowDetail extends AppCompatActivity
                 }
             }
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REGISTRATION_REQUEST_CODE) {
-            //해당 fragement의 화면 초기화.
-            Bundle bundle = new Bundle();
-            bundle.putString("date", date);
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment.getClass(), bundle, fragment.getTag()).commit(); // 프래그먼트 재시작.
-        }
     }
 
 

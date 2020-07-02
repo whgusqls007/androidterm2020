@@ -6,12 +6,12 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/achieveList"
-            android:title="달성도 확인창"/>
+            android:title="달성도 확인"/>
         <item
             android:id="@+id/scheduleModification"
-            android:title="일정 수정창"/>
+            android:title="일정 수정"/>
         <item
             android:id="@+id/deleteSchedules"
-            android:title="일정 삭제창"/>
+            android:title="일정 삭제"/>
     </group>
 </menu>

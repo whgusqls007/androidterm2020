@@ -30,7 +30,6 @@
         <receiver android:name=".Alarm_Receiver" />
         <activity android:name=".ScheduleUpdateActivity" />
         <activity android:name=".ScheduleRegistrationActivity" />
-        <activity android:name=".PickDActivity" />
         <activity android:name=".ShowDetail" />
         <activity android:name=".Achieve" />
         <activity android:name=".MainActivity">
