@@ -39,14 +39,12 @@ public class ShowAllSchedule extends AppCompatActivity implements NavigationView
     ScheduleAllModificationFragment scheduleAllModificationFragment;
     DeleteAllSchedulesFragment deleteAllSchedulesFragment;
 
-    List<Schedule> mSchedules;
     ScheduleViewModel scheduleViewModel;
     String date;
     FloatingActionButton floatingActionButton;
 
     final static int REGISTRATION_REQUEST_CODE = 111;
 
-    int count;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -61,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
     boolean settingInfo;
 
 
-    List<Schedule> mAllSchedule;
-
     String date;
 
     ScheduleViewModel scheduleViewModel;
@@ -72,24 +70,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Stetho.initializeWithDefaults(this);
-        // 오늘날짜를 가져와야함. 해당일의 일정을 check하기 위함.
-        setScheduleViewModel();
+        
+        init();
 
-        setGps();
 
-        setToolbar();
-
-        setCalendar();
-        // 임시버튼들, 나중에 다 지워야함. xml도 수정해야함.
-
-        // 사이드 매뉴 담당
-        setListView();
         // 하루가 바뀌면 해야할 것이 2가지 있다.
         // 1. 지난날의 기록 삭제
         // 2. 오늘의 일정을 알람 매니저에 등록. -> 다중 알람 기능.
         // 그리고 폰을 껐다 킨 경우 해야할 것이 있다.
         // 1. 폰을 다시 키면서 알람을 다시 등록. // 끄고나면 알람이 사라지기 때문...
+    }
+
+    private void init() {
+        Stetho.initializeWithDefaults(this);
+        setScheduleViewModel();
+        setGps();
+        setToolbar();
+        setCalendar();
+        setListView();
     }
 
     private void setScheduleViewModel() {

@@ -6,7 +6,7 @@ import androidx.room.Room;
 
 public class RoomDatabaseAccessor {
     private static RoomDatabase mRoomDatabaseInstance;
-    private static final String DB_NAME = "test.db";
+    private static final String DB_NAME = "test2.db";
 
 //    static final ExecutorService databaseWriteExecutor =
 //            Executors.newFixedThreadPool(NUMBER_OF_THREADS);

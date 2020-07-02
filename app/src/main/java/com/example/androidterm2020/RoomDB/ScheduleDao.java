@@ -44,28 +44,4 @@ public interface ScheduleDao {
     @Query("DELETE FROM schedule_tb WHERE sid = :targetId")
     void deleteScheduleById(int targetId);
 
-
-//    @Query("SELECT * from schedule_tb ORDER BY strDate ASC")
-//    LiveData<List<Schedule>> getAllSchedules();
-//
-//    @Query("SELECT * from schedule_tb WHERE strDate >= :date ORDER BY strDate ASC")
-//    LiveData<List<Schedule>> getSchedulesByDate(String date); // 매인에서 그날에 등록된 일정이 있는지 없는지 확인용.
-//
-//    @Query("SELECT * from schedule_tb where sid = :id")
-//    Schedule getScheduleById(int id); // 달성도 찾는데 사용함.
-//
-//    @Insert(onConflict = OnConflictStrategy.IGNORE)
-//    void insert(Schedule name);
-//
-//    @Update
-//    void updateSchedule(Schedule schedule); // PK가 같은 녀석을 찾아서 update
-//
-//    @Query("DELETE FROM schedule_tb")
-//    void deleteScheduleAll();
-//
-//    @Delete
-//    void deleteSchedules(Schedule... schedules);
-//
-//    @Query("DELETE FROM schedule_tb WHERE strDate < :date")
-//    void deletePreviousDate(String date); // 보통은 지난 일정을 지우는 용으로 사용.
 }
