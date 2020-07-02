@@ -1,4 +1,4 @@
-package com.example.androidterm2020;
+package com.example.androidterm2020.Fragments;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -19,10 +19,12 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.androidterm2020.R;
 import com.example.androidterm2020.RoomDB.RoomDatabase;
 import com.example.androidterm2020.RoomDB.RoomDatabaseAccessor;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
+import com.example.androidterm2020.ShowDetail;
 
 import java.math.RoundingMode;
 import java.util.ArrayList;

@@ -1,14 +1,14 @@
 package com.example.androidterm2020;
 
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.androidterm2020.Fragments.AchieveAfterFragment;
+import com.example.androidterm2020.Fragments.AchieveBeforeFragment;
+import com.example.androidterm2020.Fragments.FragmentCallback;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 

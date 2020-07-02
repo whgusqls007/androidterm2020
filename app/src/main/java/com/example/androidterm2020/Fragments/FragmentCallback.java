@@ -1,4 +1,4 @@
-package com.example.androidterm2020;
+package com.example.androidterm2020.Fragments;
 
 import android.os.Bundle;
 

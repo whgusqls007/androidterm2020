@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity android:name=".Setting"></activity>
-        <activity android:name=".AirTask" />
+        <activity android:name=".API_Task.AirTask" />
         <activity android:name=".ShowAllSchedule" />
 
         <service

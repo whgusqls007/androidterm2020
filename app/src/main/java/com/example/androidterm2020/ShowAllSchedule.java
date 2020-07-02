@@ -11,16 +11,18 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.androidterm2020.Fragments.AchieveAllListFragment;
+import com.example.androidterm2020.Fragments.DeleteAllSchedulesFragment;
+import com.example.androidterm2020.Fragments.FragmentCallback;
+import com.example.androidterm2020.Fragments.ScheduleAllModificationFragment;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -28,7 +30,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.util.List;
 
-public class ShowAllSchedule extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FragmentCallback{
+public class ShowAllSchedule extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FragmentCallback {
 
     Toolbar myToolbar;
     DrawerLayout drawer;

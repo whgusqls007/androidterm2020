@@ -13,6 +13,9 @@ import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
+import com.example.androidterm2020.API_Task.AirTask;
+import com.example.androidterm2020.API_Task.ReceiveWeatherTask;
+
 import java.util.concurrent.ExecutionException;
 
 public class Alarm_Receiver extends BroadcastReceiver {

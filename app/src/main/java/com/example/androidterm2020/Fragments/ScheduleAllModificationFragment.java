@@ -1,41 +1,31 @@
-package com.example.androidterm2020;
+package com.example.androidterm2020.Fragments;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
-import android.icu.lang.UCharacter;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.androidterm2020.RoomDB.RoomDatabase;
-import com.example.androidterm2020.RoomDB.RoomDatabaseAccessor;
+import com.example.androidterm2020.R;
 import com.example.androidterm2020.RoomDB.Schedule;
-import com.example.androidterm2020.RoomDB.ScheduleDao;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
+import com.example.androidterm2020.ScheduleUpdateActivity;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-public class AchieveListFragment extends Fragment {
+public class ScheduleAllModificationFragment extends Fragment {
     LinearLayout baseLayout = null;
     ScrollView scrollList;
     LinearLayout targetLayout;
@@ -47,15 +37,14 @@ public class AchieveListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View rootView = (View) inflater.inflate(R.layout.acheive_list_fragment, container, false);
+        View rootView = (View) inflater.inflate(R.layout.schedule_modification_fragment, container, false); // 수정
         baseLayout = rootView.findViewById(R.id.base);
         scrollList = new ScrollView(getContext());
         targetLayout = new LinearLayout(getContext());
         targetLayout.setOrientation(LinearLayout.VERTICAL);
 
-        String date = getArguments().getString("date");
-        setScheduleViewModel(date); // 번들로 가져오자.
-        mSchedules = scheduleViewModel.getDateSchedules(getLongDate(date));
+        setScheduleViewModel(); // 번들로 가져오자.
+        mSchedules = scheduleViewModel.getAllSchedules();
         setScheduleList(getActivity());
 
         scrollList.addView(targetLayout);
@@ -65,6 +54,7 @@ public class AchieveListFragment extends Fragment {
     }
 
     private void setScheduleList(Context context) {
+        int size = mSchedules.size();
         insertTargetLayout(context);
         for(Schedule schedule: mSchedules) { // 여기서는 checkBox 지워라.
             insertSchedule(context, schedule);
@@ -74,18 +64,24 @@ public class AchieveListFragment extends Fragment {
         LinearLayout linearLayout = createLinearLayout(context); // 단위 레이아웃 생성.
         linearLayout.setBackgroundColor(Color.GRAY);
 
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 50, getResources().getDisplayMetrics());
-        int titleWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 310, getResources().getDisplayMetrics());
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 105, getResources().getDisplayMetrics());
+        int endDayWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 105, getResources().getDisplayMetrics());
+        int titleWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 150, getResources().getDisplayMetrics());
         int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 30, getResources().getDisplayMetrics());
-        TextView timeTextView = createTitleTextView(context, "시간");
-        timeTextView.setLayoutParams(new LinearLayout.LayoutParams(width, height));
-        timeTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        TextView strTimeView = createTitleTextView(context, "시작시간");
+        strTimeView.setLayoutParams(new LinearLayout.LayoutParams(width, height));
+        strTimeView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+
+        TextView endTimeView = createTitleTextView(context, "종료일시");
+        endTimeView.setLayoutParams(new LinearLayout.LayoutParams(endDayWidth, height));
+        endTimeView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
 
         TextView titleTextView = createTitleTextView(context, "일정 제목"); // 여기짜지 집어넣을 변수선언.
         titleTextView.setLayoutParams(new LinearLayout.LayoutParams(titleWidth, height));
-        titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
 
-        linearLayout.addView(timeTextView);
+        linearLayout.addView(strTimeView);
+        linearLayout.addView(endTimeView);
         linearLayout.addView(titleTextView); // View를 단위 레이아웃에 넣는다.
 
         targetLayout.addView(linearLayout); // 모든 설정이 끝난 레이아웃을 스크롤뷰 내부의 레이아웃에 넣는다.
@@ -95,19 +91,22 @@ public class AchieveListFragment extends Fragment {
     private void insertSchedule(final Context context, Schedule schedule) {
         final LinearLayout linearLayout = createLinearLayout(context); // 단위 레이아웃 생성.
 
-        TextView timeTextView = createTimeTextView(context, schedule.getStrDate());
-        timeTextView.setTextColor(Color.BLACK);
+        TextView strTimeTextView = createTimeTextView(context, schedule.getStrDate());
+        strTimeTextView.setTextColor(Color.BLACK);
+        TextView endTimeTextView = createEndTimeTextView(context, schedule.getEndDate());
+        endTimeTextView.setTextColor(Color.BLACK);
         TextView titleTextView = createTitleTextView(context, schedule.getTitle()); // 여기짜지 집어넣을 변수선언.
         titleTextView.setTextColor(Color.BLACK);
         linearLayout.setId(schedule.getSid()); // checkBox가 없을때.
 
-        linearLayout.addView(timeTextView);
+        linearLayout.addView(strTimeTextView);
+        linearLayout.addView(endTimeTextView);
         linearLayout.addView(titleTextView); // View를 단위 레이아웃에 넣는다.
         linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "레이아웃 클릭", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getContext(), Achieve.class);
+                Toast.makeText(context, "수정창으로 갑니다.", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), ScheduleUpdateActivity.class);
                 intent.putExtra("sid", linearLayout.getId());
                 startActivityForResult(intent, 111);
             }
@@ -116,30 +115,38 @@ public class AchieveListFragment extends Fragment {
         targetLayout.addView(linearLayout); // 모든 설정이 끝난 레이아웃을 스크롤뷰 내부의 레이아웃에 넣는다.
     }
 
-    private void setScheduleViewModel(String date) {
+    private void setScheduleViewModel() {
         scheduleViewModel = new ViewModelProvider(getActivity()).get(ScheduleViewModel.class);
     }
 
-    private LinearLayout createLinearLayout(Context context) {
-        LinearLayout linearLayout = new LinearLayout(context);
+    private LinearLayout createLinearLayout(final Context context) {
+        final LinearLayout linearLayout = new LinearLayout(context);
         linearLayout.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-
         return linearLayout;
     }
 
     private TextView createTimeTextView(Context context, long strDate) {
         TextView textView = new TextView(context);
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 50, getResources().getDisplayMetrics());
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 105, getResources().getDisplayMetrics());
         textView.setLayoutParams(new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
-        textView.setText(getTime(strDate));
+        textView.setText(getDateTime(strDate));
         textView.setGravity(Gravity.CENTER);
         textView.setBackgroundResource(R.drawable.border);
         return textView;
     }
 
-    private String getTime(long strDate) { // 20200623 1122 에서 1122만 가져온다.
+    private TextView createEndTimeTextView(Context context, long endDate) {
+        TextView textView = new TextView(context);
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 105, getResources().getDisplayMetrics());
+        textView.setLayoutParams(new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
+        textView.setText(getDateTime(endDate));
+        textView.setGravity(Gravity.CENTER);
+        textView.setBackgroundResource(R.drawable.border);
+        return textView;
+    }
+
+    private String getDateTime(long strDate) { // 20200623 1122 에서 1122만 가져온다.
         String result = "";
 
         for(int i=0; i<4; ++i) {
@@ -149,17 +156,26 @@ public class AchieveListFragment extends Fragment {
                 result += ":";
             }
         }
-        result = (new StringBuffer(result)).reverse().toString(); // 11:22
+        // 만약 보기 안좋으면 여기에서 뉴라인 추가
+        result += " ";
+        for(int i=0; i<6; ++i) {
+            result += (strDate%10); // 2211
+            strDate /= 10;
+            if(i%2 == 1 && i != 5) {
+                result += "/";
+            }
+        }
+        result = (new StringBuffer(result)).reverse().toString(); //20/06/23 11:22
 
         return result;
     }
 
     private TextView createTitleTextView(Context context, String title) {
         TextView textView = new TextView(context);
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 310, getResources().getDisplayMetrics());
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 150, getResources().getDisplayMetrics());
         textView.setLayoutParams(new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
         textView.setText(title);
-        textView.setGravity(Gravity.CENTER_HORIZONTAL);
+        textView.setGravity(Gravity.CENTER);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
         textView.setBackgroundResource(R.drawable.border);
         return textView;
@@ -169,5 +185,5 @@ public class AchieveListFragment extends Fragment {
         date = date.replaceAll("[ :-]", "");
         return Long.parseLong(date);
     }
-
 }
+

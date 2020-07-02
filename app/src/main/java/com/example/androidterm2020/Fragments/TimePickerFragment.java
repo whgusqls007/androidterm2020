@@ -1,4 +1,4 @@
-package com.example.androidterm2020;
+package com.example.androidterm2020.Fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
+
+import com.example.androidterm2020.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

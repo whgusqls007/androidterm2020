@@ -1,4 +1,4 @@
-package com.example.androidterm2020;
+package com.example.androidterm2020.Fragments;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -22,8 +22,10 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.transition.FragmentTransitionSupport;
 
+import com.example.androidterm2020.R;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
+import com.example.androidterm2020.ShowAllSchedule;
 
 import java.util.ArrayList;
 import java.util.List;
