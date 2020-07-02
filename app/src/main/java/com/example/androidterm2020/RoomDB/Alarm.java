@@ -29,4 +29,8 @@ public class Alarm {
     public void setRequestId(int requestId) {
         this.requestId = requestId;
     }
+
+    public Alarm(int requestId) {
+        this.requestId = requestId;
+    }
 }
