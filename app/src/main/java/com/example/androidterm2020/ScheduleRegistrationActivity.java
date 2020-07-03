@@ -315,7 +315,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         editor.putInt(Integer.toString(alarm_requestCode), alarm_requestCode);
         editor.apply();
 
-        if(period == -1){
+        if(period == 0){ // 반복없음.
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
@@ -324,7 +324,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
                 }
             }
         }
-        else if (period == 2) {
+        else if (period == 1) { // 반복인데...
             long INTERVAL = 1000 * 60;
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
