@@ -21,7 +21,14 @@
         <activity android:name=".Setting"></activity>
         <activity android:name=".API_Task.AirTask" />
         <activity android:name=".ShowAllSchedule" />
-
+        <service android:name=".RestartAlarmService"/>
+        <receiver android:name=".BootReceiver"
+            android:exported="false"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
         <service
             android:name=".GpsTracker"
             android:enabled="true"

@@ -237,10 +237,12 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             diaryNotification(calendar);
         }
 
-        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm:ss");
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm");
         String titleName = title.getText().toString();
         long strDate = getLongDate(scheduleStrDate.getText().toString() + " " + scheduleStrTime.getText().toString());
         long endDate = getLongDate(scheduleEndDate.getText().toString() + " " + scheduleEndTime.getText().toString());
+
+//        getDatetimeData(scheduleStrDate.getText().toString() + " " + scheduleStrTime.getText().toString());
 
         String detailData = details.getText().toString();
         int periodData = period;
@@ -257,6 +259,17 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
         return id;
     }
+   // 시험용 잘 동작함.
+//    private void getDatetimeData(String datetime) {
+//        // 0123456789012345
+//
+//        int[] datetimeData = new int[5];
+//        datetimeData[0] = Integer.parseInt(datetime.substring(0,4)); // year
+//        datetimeData[1] = Integer.parseInt(datetime.substring(5,7)); // month
+//        datetimeData[2] = Integer.parseInt(datetime.substring(8,10)); // day
+//        datetimeData[3] = Integer.parseInt(datetime.substring(11,13)); // hour
+//        datetimeData[4] = Integer.parseInt(datetime.substring(14,16)); // minute
+//    }
 
     private long getLongDate(String date) {
         date = date.replaceAll("[ :-]", "");
