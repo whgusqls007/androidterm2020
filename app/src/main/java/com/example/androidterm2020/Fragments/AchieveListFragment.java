@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.icu.lang.UCharacter;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
@@ -33,6 +35,8 @@ import com.example.androidterm2020.RoomDB.RoomDatabaseAccessor;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleDao;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
+import com.example.androidterm2020.ShowAllSchedule;
+import com.example.androidterm2020.ShowDetail;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -112,6 +116,19 @@ public class AchieveListFragment extends Fragment {
                 Intent intent = new Intent(getContext(), Achieve.class);
                 intent.putExtra("sid", linearLayout.getId());
                 startActivityForResult(intent, 111);
+            }
+        });
+        linearLayout.setOnLongClickListener(new View.OnLongClickListener(){
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public boolean onLongClick(View v){
+                Toast.makeText(context, "레이아웃 롱클릭", Toast.LENGTH_SHORT).show();
+                final Bundle bundle = new Bundle();
+                bundle.putInt("sid", linearLayout.getId());
+                bundle.putString("date", getArguments().getString("date"));
+                ((ShowDetail)getActivity()).onFragmentSelected(2, bundle);
+                // getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, DeleteAllSchedulesFragment.class, bundle, "delete").commit();
+                return true;
             }
         });
 

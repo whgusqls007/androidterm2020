@@ -61,12 +61,7 @@ public class DeleteAllSchedulesFragment extends Fragment {
         Bundle bundle = getArguments();
         setScheduleViewModel(); // 번들로 가져오자.
         mSchedules = scheduleViewModel.getAllSchedules();
-        scheduleViewModel.getAllSchedulesObserve().observe(this, new Observer<List<Schedule>>() {
-            @Override
-            public void onChanged(List<Schedule> schedules) {
-                //refresh();
-            }
-        });
+
         setScheduleList(getActivity());
 
         scrollList.addView(targetLayout);
@@ -75,6 +70,22 @@ public class DeleteAllSchedulesFragment extends Fragment {
         if(mSchedules.size() == 0) {
             ((ShowAllSchedule)getActivity()).setFloatingActionButtonImgPlus();
         }
+
+
+        int targetId = -1;
+        if(getArguments() != null) {
+            targetId = getArguments().getInt("sid");
+        }
+
+        if(targetId != -1) {
+            for(CheckBox checkBox: checkBoxList) {
+                if(checkBox.getId() == targetId) {
+                    checkBox.setChecked(true);
+                    break;
+                }
+            }
+        }
+
         return rootView;
     }
 
@@ -223,8 +234,6 @@ public class DeleteAllSchedulesFragment extends Fragment {
     }
 
     public void deleteSchedules() {
-        if(checkedNum <= 0)
-            return;
         for(CheckBox cb : checkBoxList) {
             if(cb.isChecked() == true) {
                 AlarmManager myAlarm = (AlarmManager)getContext().getSystemService(Context.ALARM_SERVICE);
@@ -238,6 +247,7 @@ public class DeleteAllSchedulesFragment extends Fragment {
                 alarmViewModel.deleteAlarmByScheduleId(cb.getId());
                 scheduleViewModel.deleteScheduleById(cb.getId());
             }
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, DeleteAllSchedulesFragment.class, null, "delete").commit();
         }
     }
 }

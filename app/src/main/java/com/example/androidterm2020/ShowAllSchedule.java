@@ -86,17 +86,14 @@ public class ShowAllSchedule extends AppCompatActivity implements NavigationView
         if(id == R.id.achieveList) {
             Toast.makeText(this, "첫 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
             onFragmentSelected(0, bundle);
-            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
         }
         else if(id == R.id.scheduleModification) {
             Toast.makeText(this, "두 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
             onFragmentSelected(1, bundle);
-            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
         }
         else if (id == R.id.deleteSchedules) {
             Toast.makeText(this, "세 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
             onFragmentSelected(2, bundle);
-            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.delete));
         }
 
         drawer.closeDrawer(GravityCompat.START);
@@ -112,19 +109,27 @@ public class ShowAllSchedule extends AppCompatActivity implements NavigationView
             curFragment = achieveAllListFragment;
             myToolbar.setTitle("달성도");
             tag = "achieve";
+            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
         }
         else if(position == 1) {
             curFragment = scheduleAllModificationFragment;
             myToolbar.setTitle("일정 수정");
             tag = "mofify";
+            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
         }
         else if(position == 2) {
             curFragment = deleteAllSchedulesFragment;
             myToolbar.setTitle("일정 삭제");
             tag = "delete";
+            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.delete));
         }
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, curFragment,  tag).commit();
+        if(bundle != null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, curFragment.getClass(), bundle,  tag).commit();
+        }
+        else {
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, curFragment,  tag).commit();
+        }
     }
 
 
@@ -152,12 +157,7 @@ public class ShowAllSchedule extends AppCompatActivity implements NavigationView
                 Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
                 if(fragment instanceof DeleteAllSchedulesFragment && ((DeleteAllSchedulesFragment) fragment).getScheduleNum() > 0) {
                     Toast.makeText(getApplicationContext(), "일정삭제", Toast.LENGTH_SHORT).show();
-                    DeleteAllSchedulesFragment delFrag = (DeleteAllSchedulesFragment)getSupportFragmentManager().findFragmentByTag("delete");
-                    delFrag.deleteSchedules();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("date", date);
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, achieveAllListFragment, "achieve").commit();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, delFrag, delFrag.getTag()).commit();
+                    ((DeleteAllSchedulesFragment)fragment).deleteSchedules();
                 }
                 else {
                     Toast.makeText(getApplicationContext(), "일정등록", Toast.LENGTH_SHORT).show();
