@@ -381,7 +381,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
     void show()
     {
-        final CharSequence[] oItems = {"없음", "격일", "1주", "한달", "1년"};
+        final CharSequence[] oItems = {"없음", "매일", "격일", "매주"};
 
         AlertDialog.Builder oDialog = new AlertDialog.Builder(this,
                 android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
