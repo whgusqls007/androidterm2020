@@ -17,6 +17,12 @@ public interface AlarmDao {
     @Query("SELECT * from alarm_tb ORDER BY aid ASC")
     LiveData<List<Alarm>> getAllAlarmsObserve();
 
+    @Query("SELECT * from alarm_tb WHERE scheduleId = :targetScheduleId ORDER BY aid ASC LIMIT 1")
+    Alarm getAlarmByScheduleId(int targetScheduleId);
+
+    @Query("SELECT aid from alarm_tb WHERE scheduleId = :targetScheduleId ORDER BY aid ASC LIMIT 1")
+    int getAlarmIdByScheduleId(int targetScheduleId);
+
     @Query("SELECT aid from alarm_tb ORDER BY aid DESC LIMIT 1")
     int getLastIdAlarm();
 

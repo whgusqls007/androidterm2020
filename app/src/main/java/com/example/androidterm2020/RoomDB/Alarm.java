@@ -10,23 +10,19 @@ import androidx.room.PrimaryKey;
         parentColumns = "sid",
         childColumns = "scheduleId"))
 public class Alarm {
+
+
     @PrimaryKey(autoGenerate = true)
     @NonNull
     @ColumnInfo(name = "aid")
-    private int aid;
-
-    private final int requestId;
+    private int requestId;
 
 
     @ColumnInfo(name = "scheduleId")
     private final int scheduleId;
 
-    public int getAid() {
-        return aid;
-    }
-
-    public void setAid(int aid) {
-        this.aid = aid;
+    public void setRequestId(int requestId) {
+        this.requestId = requestId;
     }
 
     public int getScheduleId() {
@@ -37,8 +33,7 @@ public class Alarm {
         return requestId;
     }
 
-    public Alarm(int requestId, int scheduleId) {
-        this.requestId = requestId;
+    public Alarm(int scheduleId) {
         this.scheduleId = scheduleId;
     }
 }

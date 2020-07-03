@@ -11,8 +11,6 @@ import java.util.concurrent.ExecutionException;
 public class AlarmViewModel extends AndroidViewModel {
     private RoomDatabase mRoomDatabase;
 
-//    private LiveData<List<Schedule>> mAllSchedules;
-//    private LiveData<List<Schedule>> mDateSchedules;
 
     public AlarmViewModel(Application application) {
         super(application);
@@ -55,6 +53,42 @@ public class AlarmViewModel extends AndroidViewModel {
         return result;
     }
 
+    public Alarm getAlarmByScheduleId(int scheduleId) {
+        Alarm result = null;
+        try {
+            result = new getAlarmByScheduleIdAsyncTask(mRoomDatabase.alarmDao()).execute(scheduleId).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public int getAlarmIdByScheduleId(int scheduleId) {
+        int result = -1;
+        try {
+            result = new getAlarmIdByScheduleIdAsyncTask(mRoomDatabase.alarmDao()).execute(scheduleId).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public void updateAlarm(Alarm alarm) {
+        try {
+            new updateAlarmAsyncTask(mRoomDatabase.alarmDao()).execute(alarm).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
     public class insertAlarmAsyncTask extends AsyncTask<Alarm, Void, Integer> {
         private AlarmDao alarmDao;
 
@@ -93,6 +127,49 @@ public class AlarmViewModel extends AndroidViewModel {
         @Override
         protected List<Alarm> doInBackground(Void... voids) {
             alarmDao.getAllAlarms();
+            return null;
+        }
+    }
+
+    public class getAlarmByScheduleIdAsyncTask extends AsyncTask<Integer, Void, Alarm> {
+        private AlarmDao alarmDao;
+
+        public getAlarmByScheduleIdAsyncTask(AlarmDao alarmDao) {
+            this.alarmDao = alarmDao;
+        }
+
+
+        @Override
+        protected Alarm doInBackground(Integer... integers) {
+            return alarmDao.getAlarmByScheduleId(integers[0]);
+        }
+    }
+
+    public class getAlarmIdByScheduleIdAsyncTask extends AsyncTask<Integer, Void, Integer> {
+        private AlarmDao alarmDao;
+
+        public getAlarmIdByScheduleIdAsyncTask(AlarmDao alarmDao) {
+            this.alarmDao = alarmDao;
+        }
+
+
+        @Override
+        protected Integer doInBackground(Integer... integers) {
+            return alarmDao.getAlarmIdByScheduleId(integers[0]);
+        }
+    }
+
+    public class updateAlarmAsyncTask extends AsyncTask<Alarm, Void, Void> {
+        private AlarmDao alarmDao;
+
+        public updateAlarmAsyncTask(AlarmDao alarmDao) {
+            this.alarmDao = alarmDao;
+        }
+
+
+        @Override
+        protected Void doInBackground(Alarm... alarms) {
+            alarmDao.updateAlarm(alarms[0]);
             return null;
         }
     }
