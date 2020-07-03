@@ -32,6 +32,6 @@ public interface AlarmDao {
     @Query("DELETE FROM alarm_tb")
     void deleteAlarmsAll();
 
-    @Query("DELETE FROM alarm_tb WHERE requestId = :targetId")
-    void deleteAlarmByRequestId(int targetId);
+    @Query("DELETE FROM alarm_tb WHERE ScheduleId = :targetScheduleId")
+    void deleteAlarmByScheduleId(int targetScheduleId);
 }
