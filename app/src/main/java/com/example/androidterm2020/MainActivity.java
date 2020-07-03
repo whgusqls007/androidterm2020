@@ -123,24 +123,57 @@ public class MainActivity extends AppCompatActivity {
 
 
         Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
-        GetWeatherData(latitude, longitude);
     }
 
     private void setListView() {
+        String[] AirData = GetAirData();
+        String[] WeatherData = GetWeatherData(latitude, longitude);
+        int pm25value = Integer.parseInt(!AirData[0].equals("-") ? AirData[0] : "0");
+        int pm10value = Integer.parseInt(!AirData[1].equals("-") ? AirData[1] : "0");
+
         adapter = new ListViewAdapter();
 
         listView = (ListView)findViewById(R.id.drawer_menu);
         listView.setAdapter(adapter);
 
-        //유동적으로 추가 가능
+        //날씨 추가.
         adapter.addItem("전체 일정");
         adapter.addItem("환경설정");
-        adapter.addItem(ContextCompat.getDrawable(this, R.drawable.sunnny), "맑음");
-        //adapter.addItem(ContextCompat.getDrawable(this, R.drawable.gasmask), "나쁨");
-        //먼지에 따라 그림이 바뀐다.
-        String[] AirData = GetAirData();
-        int pm25value = Integer.parseInt(!AirData[0].equals("-") ? AirData[0] : "0");
-        int pm10value = Integer.parseInt(!AirData[1].equals("-") ? AirData[1] : "0");
+        if(WeatherData[0].equals("Rain")) {
+            adapter.addItem(ContextCompat.getDrawable(this, R.drawable.rainy), "비가 내림");
+        }
+        else if(WeatherData[0].equals("Snow")) {
+            adapter.addItem(ContextCompat.getDrawable(this, R.drawable.snow), "눈이 내림");
+        }
+        else if(WeatherData[0].equals("Clouds")) {
+            adapter.addItem(ContextCompat.getDrawable(this, R.drawable.cloudy), "흐림");
+        }
+        else if(WeatherData[0].equals("Clear")) {
+            adapter.addItem(ContextCompat.getDrawable(this, R.drawable.sunnny), "맑음");
+        }
+        else if(WeatherData[0].equals("Drizzle")) {
+            adapter.addItem(ContextCompat.getDrawable(this, R.drawable.drizzle_rain), "이슬비");
+        }
+        else { // 잘 일어나지 않는 기상사건
+            if(WeatherData[0].equals("Thunderstorm") || WeatherData[0].equals("Squall")) {
+                adapter.addItem(ContextCompat.getDrawable(this, R.drawable.thunder_storm), "폭풍");
+            }
+            else if(WeatherData[0].equals("Mist")
+                    || WeatherData[0].equals("Fog")
+                    || WeatherData[0].equals("Haze")) { // 안개
+                adapter.addItem(ContextCompat.getDrawable(this, R.drawable.fog), "안개");
+            }
+            else if(WeatherData[0].equals("Dust") || WeatherData[0].equals("Sand")) { // 먼지
+                adapter.addItem(ContextCompat.getDrawable(this, R.drawable.dust), WeatherData[0]);
+            }
+            else if(WeatherData[0].equals("Smoke")) { // 연기
+                adapter.addItem(ContextCompat.getDrawable(this, R.drawable.smog), WeatherData[0]);
+            }
+            else { // 나머지는 치명적임. 아마 목숨이 위험할 듯. 화산재, 토네이도 이런 부류...
+                adapter.addItem(ContextCompat.getDrawable(this, R.drawable.skull), WeatherData[0]);
+            }
+        }
+
 
         if(pm25value <= 15 || pm10value <= 30){
             adapter.addItem(ContextCompat.getDrawable(this, R.drawable.good), "미세먼지 없음");
@@ -419,9 +452,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n")
-    protected void GetWeatherData(double lan, double lon){
+    protected String[] GetWeatherData(double lan, double lon){
         String[] resultText = new String[5];
-//        TextView weather = (TextView)findViewById(R.id.weather);
+
         try{
             resultText = new ReceiveWeatherTask(lan, lon).execute().get();
         } catch (InterruptedException e) {
@@ -429,9 +462,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-//        weather.setText(resultText[0].toString());
-//        weather2.setText(resultText[1].toString());
-//        weather3.setText("현재온도 : " + resultText[2] + ", 최고온도 : " + resultText[4] + ", 최저온도 : " + resultText[3]);
+
+        return resultText;
 
     }
 

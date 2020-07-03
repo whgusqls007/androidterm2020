@@ -176,13 +176,13 @@ public class DeleteAllSchedulesFragment extends Fragment {
         TextView textView = new TextView(context);
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 106, getResources().getDisplayMetrics());
         textView.setLayoutParams(new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
-        textView.setText(getTime(strDate));
+        textView.setText(getDateTime(strDate));
         textView.setGravity(Gravity.CENTER_HORIZONTAL);
         textView.setBackgroundResource(R.drawable.border);
         return textView;
     }
 
-    private String getTime(long strDate) { // 20200623 1122 에서 1122만 가져온다.
+    private String getDateTime(long strDate) { // 20200623 1122 에서 1122만 가져온다.
         String result = "";
 
         for(int i=0; i<4; ++i) {
@@ -192,7 +192,16 @@ public class DeleteAllSchedulesFragment extends Fragment {
                 result += ":";
             }
         }
-        result = (new StringBuffer(result)).reverse().toString(); // 11:22
+        // 만약 보기 안좋으면 여기에서 뉴라인 추가
+        result += " ";
+        for(int i=0; i<6; ++i) {
+            result += (strDate%10); // 2211
+            strDate /= 10;
+            if(i%2 == 1 && i != 5) {
+                result += "/";
+            }
+        }
+        result = (new StringBuffer(result)).reverse().toString(); //20/06/23 11:22
 
         return result;
     }
