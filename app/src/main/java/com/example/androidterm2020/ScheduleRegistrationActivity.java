@@ -247,10 +247,11 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             int start_day = Integer.parseInt(scheduleStrDate.getText().toString().substring(8, 10));
             GregorianCalendar calendar = (GregorianCalendar) GregorianCalendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.set(start_year, start_month - 1, start_day+1, start_hour, start_min, 0);
+            calendar.set(start_year, start_month - 1, start_day + 1, start_hour - 1, start_min, 0);
             if (calendar.before(Calendar.getInstance())) {
                 calendar.add(GregorianCalendar.YEAR, 1);
                 calendar.add(GregorianCalendar.DATE, -1);
+                // start_day + 1 된거랑 start_day - 1 된거 나중에 지워야함..
                 Toast.makeText(ScheduleRegistrationActivity.this, "내년으로 설정", Toast.LENGTH_LONG).show();
             }
             calendar.add(GregorianCalendar.DATE, -1);
