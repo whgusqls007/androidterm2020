@@ -17,7 +17,7 @@ public class AlarmViewModel extends AndroidViewModel {
         mRoomDatabase = RoomDatabaseAccessor.getInstance(application);
     }
 
-    public int InsertAlarm(Alarm alarm) {
+    public int insertAlarm(Alarm alarm) {
         int id = -1;
         try {
             id = new insertAlarmAsyncTask(mRoomDatabase.alarmDao()).execute(alarm).get();

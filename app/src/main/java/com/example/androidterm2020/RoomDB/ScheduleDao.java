@@ -16,6 +16,9 @@ public interface ScheduleDao {
     @Query("SELECT * from schedule_tb ORDER BY strDate ASC")
     List<Schedule> getALLSchedules();
 
+    @Query("SELECT * from schedule_tb WHERE period != 0 ORDER BY strDate ASC")
+    List<Schedule> getALLRepeatSchedules();
+
     @Query("SELECT * from schedule_tb ORDER BY strDate ASC")
     LiveData<List<Schedule>> getALLSchedulesObserve();
 

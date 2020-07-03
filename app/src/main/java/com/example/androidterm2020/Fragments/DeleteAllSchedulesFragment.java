@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.transition.FragmentTransitionSupport;
 
 import com.example.androidterm2020.R;
+import com.example.androidterm2020.RoomDB.AlarmViewModel;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 import com.example.androidterm2020.ShowAllSchedule;
@@ -36,6 +37,7 @@ public class DeleteAllSchedulesFragment extends Fragment {
     LinearLayout targetLayout;
 
     private ScheduleViewModel scheduleViewModel;
+    private AlarmViewModel alarmViewModel;
     List<Schedule> mSchedules;
     ArrayList<CheckBox> checkBoxList;
 
@@ -157,6 +159,7 @@ public class DeleteAllSchedulesFragment extends Fragment {
 
     private void setScheduleViewModel() {
         scheduleViewModel = new ViewModelProvider(getActivity()).get(ScheduleViewModel.class);
+        alarmViewModel = new ViewModelProvider(getActivity()).get(AlarmViewModel.class);
     }
 
     private LinearLayout createLinearLayout(Context context) {
@@ -212,6 +215,7 @@ public class DeleteAllSchedulesFragment extends Fragment {
             return;
         for(CheckBox cb : checkBoxList) {
             if(cb.isChecked() == true) {
+                alarmViewModel.deleteAlarmByScheduleId(cb.getId());
                 scheduleViewModel.deleteScheduleById(cb.getId());
             }
         }

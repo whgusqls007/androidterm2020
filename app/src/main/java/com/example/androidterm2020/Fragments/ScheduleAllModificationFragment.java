@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.androidterm2020.R;
+import com.example.androidterm2020.RoomDB.AlarmViewModel;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 import com.example.androidterm2020.ScheduleUpdateActivity;
@@ -31,6 +32,7 @@ public class ScheduleAllModificationFragment extends Fragment {
     LinearLayout targetLayout;
 
     private ScheduleViewModel scheduleViewModel;
+    private AlarmViewModel alarmViewModel;
     List<Schedule> mSchedules;
 
 

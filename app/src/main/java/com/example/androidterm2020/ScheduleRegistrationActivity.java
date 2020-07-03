@@ -27,6 +27,8 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.androidterm2020.Receivers.Alarm_Receiver;
+import com.example.androidterm2020.RoomDB.Alarm;
+import com.example.androidterm2020.RoomDB.AlarmViewModel;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 
@@ -58,6 +60,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
 
     private ScheduleViewModel scheduleViewModel;
+    private AlarmViewModel alarmViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +77,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     private void init(String datetime) {
         initUI(datetime);
         setCheckBoxes();
-        initScheduleViewModel();
+        initViewModels();
         initButtons(datetime);
     }
 
@@ -109,8 +112,9 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
     }
 
-    private void initScheduleViewModel () {
+    private void initViewModels() {
         scheduleViewModel = new ViewModelProvider(this).get(ScheduleViewModel.class);
+        alarmViewModel = new ViewModelProvider(this).get(AlarmViewModel.class);
     }
 
     private void initUI(String datetime) {
@@ -213,23 +217,6 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     // 하나라도 안적혀있으면 등록이 안된다고 알리는 알림을 호출하는 기능을 추가해야함.
     private int insertSchedule() {
-        if(allow_alarm) {
-            int start_hour = Integer.parseInt(scheduleStrTime.getText().toString().substring(0, 2));
-            int start_min = Integer.parseInt(scheduleStrTime.getText().toString().substring(3, 5));
-            int start_year = Integer.parseInt(scheduleStrDate.getText().toString().substring(0, 4));
-            int start_month = Integer.parseInt(scheduleStrDate.getText().toString().substring(5, 7));
-            int start_day = Integer.parseInt(scheduleStrDate.getText().toString().substring(8, 10));
-            GregorianCalendar calendar = (GregorianCalendar) GregorianCalendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.set(start_year, start_month - 1, start_day+1, start_hour, start_min, 0);
-            if (calendar.before(Calendar.getInstance())) {
-                calendar.add(GregorianCalendar.YEAR, 1);
-                calendar.add(GregorianCalendar.DATE, -1);
-                Toast.makeText(ScheduleRegistrationActivity.this, "내년으로 설정", Toast.LENGTH_LONG).show();
-            }
-            calendar.add(GregorianCalendar.DATE, -1);
-            diaryNotification(calendar);
-        }
 
         SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm");
         String titleName = title.getText().toString();
@@ -250,6 +237,27 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
         Schedule schedule = new Schedule(titleName, strDate, endDate, detailData, periodData, dateNum, index, data);
         int id = scheduleViewModel.insertSchedule(schedule);
+
+        Alarm alarm = new Alarm(id);
+        if(allow_alarm) {
+            int start_hour = Integer.parseInt(scheduleStrTime.getText().toString().substring(0, 2));
+            int start_min = Integer.parseInt(scheduleStrTime.getText().toString().substring(3, 5));
+            int start_year = Integer.parseInt(scheduleStrDate.getText().toString().substring(0, 4));
+            int start_month = Integer.parseInt(scheduleStrDate.getText().toString().substring(5, 7));
+            int start_day = Integer.parseInt(scheduleStrDate.getText().toString().substring(8, 10));
+            GregorianCalendar calendar = (GregorianCalendar) GregorianCalendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.set(start_year, start_month - 1, start_day+1, start_hour, start_min, 0);
+            if (calendar.before(Calendar.getInstance())) {
+                calendar.add(GregorianCalendar.YEAR, 1);
+                calendar.add(GregorianCalendar.DATE, -1);
+                Toast.makeText(ScheduleRegistrationActivity.this, "내년으로 설정", Toast.LENGTH_LONG).show();
+            }
+            calendar.add(GregorianCalendar.DATE, -1);
+            diaryNotification(calendar, alarmViewModel.insertAlarm(alarm));
+        }
+
+
 
         return id;
     }
@@ -290,8 +298,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         return calDateDays + 1;
     }
     @SuppressLint("ShortAlarm")
-    void diaryNotification(Calendar calendar) {
-        int alarm_requestCode = 0;
+    void diaryNotification(Calendar calendar, int alarm_requestCode) {
         Intent alarmIntent = new Intent(this, Alarm_Receiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarm_requestCode, alarmIntent, 0);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);

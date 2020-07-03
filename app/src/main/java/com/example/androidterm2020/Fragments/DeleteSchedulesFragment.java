@@ -20,16 +20,13 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.androidterm2020.R;
-import com.example.androidterm2020.RoomDB.RoomDatabase;
-import com.example.androidterm2020.RoomDB.RoomDatabaseAccessor;
+import com.example.androidterm2020.RoomDB.AlarmViewModel;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 import com.example.androidterm2020.ShowDetail;
 
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class DeleteSchedulesFragment extends Fragment {
     LinearLayout baseLayout = null;
@@ -37,6 +34,7 @@ public class DeleteSchedulesFragment extends Fragment {
     LinearLayout targetLayout;
 
     private ScheduleViewModel scheduleViewModel;
+    private AlarmViewModel alarmViewModel;
     List<Schedule> mSchedules;
     ArrayList<CheckBox> checkBoxList;
 
@@ -55,7 +53,7 @@ public class DeleteSchedulesFragment extends Fragment {
         targetLayout.setOrientation(LinearLayout.VERTICAL);
 
         String date = getArguments().getString("date");
-        setScheduleViewModel(date); // 번들로 가져오자.
+        setViewModels(date); // 번들로 가져오자.
         mSchedules = scheduleViewModel.getDateSchedules(getLongDate(date));
         setScheduleList(getActivity());
 
@@ -147,8 +145,9 @@ public class DeleteSchedulesFragment extends Fragment {
         return checkBox;
     }
 
-    private void setScheduleViewModel(String date) {
+    private void setViewModels(String date) {
         scheduleViewModel = new ViewModelProvider(getActivity()).get(ScheduleViewModel.class);
+        alarmViewModel = new ViewModelProvider(getActivity()).get(AlarmViewModel.class);
     }
 
     private LinearLayout createLinearLayout(Context context) {
@@ -204,6 +203,7 @@ public class DeleteSchedulesFragment extends Fragment {
             return;
         for(CheckBox cb : checkBoxList) {
             if(cb.isChecked() == true) {
+                alarmViewModel.deleteAlarmByScheduleId(cb.getId());
                 scheduleViewModel.deleteScheduleById(cb.getId());
             }
         }

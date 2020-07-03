@@ -98,6 +98,19 @@ public class ScheduleViewModel extends AndroidViewModel {
         return Schedule;
     }
 
+    public List<Schedule> getAllRepeatSchedule() {
+        List<Schedule> Schedules = null;
+        try {
+            Schedules = new getAllRepeatScheduleAsyncTask(mRoomDatabase.scheduleDao()).execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return Schedules;
+    }
+
     public void updateSchedule(Schedule schedule) {
         try {
             new updateScheduleAsyncTask(mRoomDatabase.scheduleDao()).execute(schedule).get();
@@ -233,6 +246,19 @@ public class ScheduleViewModel extends AndroidViewModel {
         protected Void doInBackground(Integer... integers) {
             scheduleDao.deleteScheduleById(integers[0]);
             return null;
+        }
+    }
+
+    public class getAllRepeatScheduleAsyncTask extends AsyncTask<Void, Void, List<Schedule>> {
+        private ScheduleDao scheduleDao;
+
+        public getAllRepeatScheduleAsyncTask(ScheduleDao scheduleDao) {
+            this.scheduleDao = scheduleDao;
+        }
+
+        @Override
+        protected List<Schedule> doInBackground(Void... voids) {
+            return scheduleDao.getALLRepeatSchedules();
         }
     }
 
