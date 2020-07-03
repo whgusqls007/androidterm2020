@@ -305,44 +305,53 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         SharedPreferences preference = getPreferences(this);
         SharedPreferences.Editor editor = preference.edit();
         SharedPreferences getprefrence = getPreferences(this);
-        while(true) {
+        while (true) {
             int checkcode = getprefrence.getInt(Integer.toString(alarm_requestCode), -1);
-            if(checkcode == -1){
+            if (checkcode == -1) {
                 break;
-            }else{
+            } else {
                 alarm_requestCode = alarm_requestCode + 1;
             }
         }
         editor.putInt(Integer.toString(alarm_requestCode), alarm_requestCode);
         editor.apply();
 
-        if(period == 0){ // 반복없음.
+        if (period == 0) { // 반복없음.
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-                }else{
+                } else {
                     alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
                 }
             }
-        }
-        else if (period == 1) { // 반복인데...
-            long INTERVAL = 1000 * 60;
+        } else if (period == 1) { // 매일
+            long INTERVAL = (long)1000 * 60 * 60 * 24;
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
-                }else{
+                } else {
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
                 }
             }
-        }
-        else if (period == 1) {
-            long INTERVAL = 1000 * 30;
+        } else if (period == 2) { // 격일
+            long INTERVAL = (long)1000 * 60 * 60 * 24 * 2;
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
-                }else{
+                } else {
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
+                }
+            }
+
+        } else if (period == 3) { // 1주
+            long INTERVAL = (long)1000 * 60 * 60 * 24 * 7;
+            if (alarmManager != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
+                } else {
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
                 }
             }

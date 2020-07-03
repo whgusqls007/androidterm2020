@@ -1,6 +1,9 @@
 package com.example.androidterm2020.Fragments;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +26,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.transition.FragmentTransitionSupport;
 
 import com.example.androidterm2020.R;
+import com.example.androidterm2020.Receivers.Alarm_Receiver;
 import com.example.androidterm2020.RoomDB.AlarmViewModel;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
@@ -215,6 +219,14 @@ public class DeleteAllSchedulesFragment extends Fragment {
             return;
         for(CheckBox cb : checkBoxList) {
             if(cb.isChecked() == true) {
+                AlarmManager myAlarm = (AlarmManager)getContext().getSystemService(Context.ALARM_SERVICE);
+                int requestCode = alarmViewModel.getAlarmIdByScheduleId(cb.getId());
+                Intent intent = new Intent(getActivity(), Alarm_Receiver.class);
+                PendingIntent sender = PendingIntent.getBroadcast(getActivity(), requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                if (sender != null) {
+                    myAlarm.cancel(sender);
+                    sender.cancel();
+                }
                 alarmViewModel.deleteAlarmByScheduleId(cb.getId());
                 scheduleViewModel.deleteScheduleById(cb.getId());
             }

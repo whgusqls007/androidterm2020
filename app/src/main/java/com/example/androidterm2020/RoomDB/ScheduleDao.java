@@ -25,6 +25,9 @@ public interface ScheduleDao {
     @Query("SELECT * from schedule_tb WHERE strDate >= :from  AND strDate <= :to ORDER BY strDate ASC")
     List<Schedule> getDateSchedules(long from, long to);
 
+    @Query("SELECT * from schedule_tb WHERE endDate >= :from  AND endDate <= :to ORDER BY strDate ASC")
+    List<Schedule> getEndDateSchedules(long from, long to);
+
     @Query("SELECT * from schedule_tb WHERE sid = :id LIMIT 1")
     Schedule getScheduleById(int id);
 

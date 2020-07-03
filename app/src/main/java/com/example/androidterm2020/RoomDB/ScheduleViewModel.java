@@ -60,9 +60,10 @@ public class ScheduleViewModel extends AndroidViewModel {
     }
 
     public List<Schedule> getDateSchedules(long date) {
+        long today = (date/10000)*10000;
         List<Schedule> schedules = null;
         try {
-            schedules = new getDateScheduleAsyncTask(mRoomDatabase.scheduleDao()).execute(date).get();
+            schedules = new getDateScheduleAsyncTask(mRoomDatabase.scheduleDao()).execute(today, today+2359).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -131,6 +132,32 @@ public class ScheduleViewModel extends AndroidViewModel {
         }
     }
 
+    public List<Schedule> getFromToSchedules(long[] fromTo) {
+        List<Schedule> Schedules = null;
+        try {
+            Schedules = new getDateScheduleAsyncTask(mRoomDatabase.scheduleDao()).execute(fromTo[0], fromTo[1]).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return Schedules;
+    }
+
+    public List<Schedule> getFromToEndDateSchedules(long[] fromTo) {
+        List<Schedule> Schedules = null;
+        try {
+            Schedules = new getFromToEndDateScheduleAsyncTask(mRoomDatabase.scheduleDao()).execute(fromTo[0], fromTo[1]).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return Schedules;
+    }
+
 
     public class getAllScheduleAsyncTask extends AsyncTask<Void, Void, List<Schedule>> {
         private ScheduleDao scheduleDao;
@@ -183,10 +210,26 @@ public class ScheduleViewModel extends AndroidViewModel {
 
         @Override
         protected List<Schedule> doInBackground(Long... days) {
-            long today = (days[0]/10000)*10000;
             List<Schedule> schedules = null;
             if(days != null && days.length > 0) {
-                schedules = scheduleDao.getDateSchedules(today, today + 2359);
+                schedules = scheduleDao.getDateSchedules(days[0], days[1]); // days[0], days[1]
+            }
+            return schedules;
+        }
+    }
+
+    public static class getFromToEndDateScheduleAsyncTask extends AsyncTask<Long, Void, List<Schedule>> {
+        private ScheduleDao scheduleDao;
+
+        public getFromToEndDateScheduleAsyncTask(ScheduleDao scheduleDao) {
+            this.scheduleDao = scheduleDao;
+        }
+
+        @Override
+        protected List<Schedule> doInBackground(Long... days) {
+            List<Schedule> schedules = null;
+            if(days != null && days.length > 0) {
+                schedules = scheduleDao.getEndDateSchedules(days[0], days[1]); // days[0], days[1]
             }
             return schedules;
         }
@@ -202,7 +245,7 @@ public class ScheduleViewModel extends AndroidViewModel {
         @Override
         protected Integer doInBackground(Long... days) {
             long today = (days[0]/10000)*10000;
-            int result = scheduleDao.getDateCountedSchedules(today, today+2359);
+            int result = scheduleDao.getDateCountedSchedules(today, today + 2359);
             return result;
         }
     }

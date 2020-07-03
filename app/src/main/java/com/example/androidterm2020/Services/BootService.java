@@ -18,16 +18,19 @@ import androidx.lifecycle.ViewModelStoreOwner;
 import com.example.androidterm2020.Receivers.Alarm_Receiver;
 import com.example.androidterm2020.RoomDB.Alarm;
 import com.example.androidterm2020.RoomDB.AlarmViewModel;
+import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-public class RestartAlarmService extends Service {
+public class BootService extends Service {
     AlarmViewModel alarmViewModel;
     ScheduleViewModel scheduleViewModel;
     List<Alarm> alarmList;
+    List<Schedule> scheduleList;
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -45,6 +48,8 @@ public class RestartAlarmService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
        // 주 작업. 서비스의 기능.
         alarmList = alarmViewModel.getAllAlarms();
+        deleteSchedules(); // 본이 껏다 켜진경우에만 이 서비스가 수행되므로 문제없다.
+        updateIndex();
         restartAlarmList();
 
 
@@ -151,33 +156,42 @@ public class RestartAlarmService extends Service {
         editor.putInt(Integer.toString(alarm_requestCode), alarm_requestCode);
         editor.apply();
 
-        if(period == -1){
+        if (period == 0) { // 반복없음.
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-                }else{
+                } else {
                     alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
                 }
             }
-        }
-        else if (period == 2) {
-            long INTERVAL = 1000 * 60;
+        } else if (period == 1) { // 매일
+            long INTERVAL = (long)1000 * 60 * 60 * 24;
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
-                }else{
+                } else {
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
                 }
             }
-        }
-        else if (period == 1) {
-            long INTERVAL = 1000 * 30;
+        } else if (period == 2) { // 격일
+            long INTERVAL = (long)1000 * 60 * 60 * 24 * 2;
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
-                }else{
+                } else {
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
+                }
+            }
+
+        } else if (period == 3) { // 1주
+            long INTERVAL = (long)1000 * 60 * 60 * 24 * 7;
+            if (alarmManager != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
+                } else {
                     alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
                 }
             }
@@ -194,5 +208,33 @@ public class RestartAlarmService extends Service {
     }
     private static SharedPreferences getPreferences(Context context) {
         return context.getSharedPreferences("Alarm", Context.MODE_PRIVATE);
+    }
+
+
+    private void updateIndex() {
+        int index = -1;
+        scheduleList = scheduleViewModel.getAllSchedules();
+        for(Schedule schedule: scheduleList) {
+            index = schedule.getIndex()+1;
+            schedule.setIndex(index);
+            scheduleViewModel.updateSchedule(schedule);
+        }
+    }
+
+    private void deleteSchedules() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm");
+        long date = (getLongDate(simpleDateFormat.format(calendar.getTime()))/10000) * 10000;
+        scheduleList = scheduleViewModel.getFromToEndDateSchedules(new long[] {RefreshDBService.START_DATETIME, date}); // 받아옴. 종료일이 오늘보다 이전인것.
+
+        for(Schedule schedule: scheduleList) {
+            alarmViewModel.deleteAlarmByScheduleId(schedule.getSid());
+            scheduleViewModel.deleteScheduleById(schedule.getSid());
+        }
+    }
+
+    private long getLongDate(String date) {
+        date = date.replaceAll("[ :-]", "");
+        return Long.parseLong(date);
     }
 }

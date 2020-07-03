@@ -32,7 +32,7 @@ public class AlarmViewModel extends AndroidViewModel {
 
     public void deleteAlarmByScheduleId(int scheduleId) {
         try {
-            new deleteAlarmByRequestIdAsyncTask(mRoomDatabase.alarmDao()).execute(scheduleId).get();
+            new deleteAlarmByScheduleIdAsyncTask(mRoomDatabase.alarmDao()).execute(scheduleId).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -103,10 +103,10 @@ public class AlarmViewModel extends AndroidViewModel {
         }
     }
 
-    public class deleteAlarmByRequestIdAsyncTask extends AsyncTask<Integer, Void, Void> {
+    public class deleteAlarmByScheduleIdAsyncTask extends AsyncTask<Integer, Void, Void> {
         private AlarmDao alarmDao;
 
-        public deleteAlarmByRequestIdAsyncTask(AlarmDao alarmDao) {
+        public deleteAlarmByScheduleIdAsyncTask(AlarmDao alarmDao) {
             this.alarmDao = alarmDao;
         }
 

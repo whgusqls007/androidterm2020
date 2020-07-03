@@ -150,13 +150,14 @@ public class ShowAllSchedule extends AppCompatActivity implements NavigationView
             @Override
             public void onClick(View v) {
                 Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
-                if(fragment instanceof DeleteSchedulesFragment && ((DeleteSchedulesFragment) fragment).getScheduleNum() > 0) {
+                if(fragment instanceof DeleteAllSchedulesFragment && ((DeleteAllSchedulesFragment) fragment).getScheduleNum() > 0) {
                     Toast.makeText(getApplicationContext(), "일정삭제", Toast.LENGTH_SHORT).show();
-                    DeleteSchedulesFragment delFrag = (DeleteSchedulesFragment)getSupportFragmentManager().findFragmentByTag("delete");
+                    DeleteAllSchedulesFragment delFrag = (DeleteAllSchedulesFragment)getSupportFragmentManager().findFragmentByTag("delete");
                     delFrag.deleteSchedules();
                     Bundle bundle = new Bundle();
                     bundle.putString("date", date);
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, delFrag.getClass(), bundle, delFrag.getTag()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, achieveAllListFragment, "achieve").commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, delFrag, delFrag.getTag()).commit();
                 }
                 else {
                     Toast.makeText(getApplicationContext(), "일정등록", Toast.LENGTH_SHORT).show();

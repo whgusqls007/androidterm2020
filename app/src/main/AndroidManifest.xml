@@ -21,7 +21,7 @@
         <activity android:name=".Setting"></activity>
         <activity android:name=".OPEN_API_Task.AirTask" />
         <activity android:name=".ShowAllSchedule" />
-        <service android:name=".Services.RestartAlarmService"/>
+        <service android:name=".Services.BootService"/>
         <receiver android:name=".Receivers.BootReceiver"
             android:exported="false"
             android:enabled="true">

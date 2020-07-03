@@ -13,6 +13,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,10 +38,13 @@ import android.widget.Toast;
 
 import com.example.androidterm2020.OPEN_API_Task.AirTask;
 import com.example.androidterm2020.OPEN_API_Task.ReceiveWeatherTask;
+import com.example.androidterm2020.Receivers.Alarm_Receiver;
+import com.example.androidterm2020.Receivers.RefreshDBReceiver;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 import com.facebook.stetho.Stetho;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -59,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     String addressString;
     boolean settingInfo;
 
+    public static final int REFRESH_DB_CODE = 100000;
 
     String date;
 
@@ -87,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         setToolbar();
         setCalendar();
         setListView();
+        RefreshDB();
     }
 
     private void setScheduleViewModel() {
@@ -206,7 +213,8 @@ public class MainActivity extends AppCompatActivity {
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int DayOfMonth) {
                 date = year  + "-" + (month > 9 ? "" : "0") + (month+1) + "-" + (DayOfMonth > 9 ? "" : "0") + DayOfMonth;
                 // 값으로 가져와야함.
-                int count = scheduleViewModel.getDateCountedSchedules(getLongDate(date + "0000"));
+                long newDate = getLongDate(date + "0000");
+                int count = scheduleViewModel.getDateCountedSchedules(newDate);
                 Intent intent = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
                 if(count > 0) {
                     intent = new Intent(getApplicationContext(), ShowDetail.class);
@@ -461,6 +469,43 @@ public class MainActivity extends AppCompatActivity {
                 + DayOfMonth;
 
         return result;
+    }
+
+    private void RefreshDB() { // DB에서 이미 종료일이 오늘보다 빠른 경우 지우고, 있는 친구들은 index를 증가시키는 걸 해야함.
+        Calendar calendar = getClearedCalendar();
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd hh:mm");
+        reserveRefreshDB(calendar);
+    }
+
+    private Calendar getClearedCalendar() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0); // 2020-06-20 00:00:00 으로 만드는 것이다.
+
+        return calendar;
+    }
+
+    @SuppressLint("ShortAlarm")
+    void reserveRefreshDB(Calendar calendar) {
+        Intent alarmIntent = new Intent(this, RefreshDBReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, REFRESH_DB_CODE, alarmIntent, 0);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+
+        if(alarmManager != null) {
+            long INTERVAL = 1000 * 60 * 60 * 24;
+            if (alarmManager != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC, calendar.getTimeInMillis(), pendingIntent); // 화면을 보여줄 필요는 없어서 WAKE는 안함.
+                    alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), INTERVAL, pendingIntent); // 다음달 자정에 실행.
+                }else{
+                    alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
+                }
+            }
+        }
     }
 
 }
