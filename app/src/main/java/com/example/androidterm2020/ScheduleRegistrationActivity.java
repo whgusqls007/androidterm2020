@@ -19,9 +19,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -57,6 +59,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     // 달력에서 날짜 누르고 여기 올때 자동으로 날짜 + 시간을 추가해주는 기능.
     String start_date;
     boolean allow_alarm = true;
+    Switch switchButton;
 
 
     private ScheduleViewModel scheduleViewModel;
@@ -79,6 +82,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
         setCheckBoxes();
         initViewModels();
         initButtons(datetime);
+        initSwitch();
     }
 
     private boolean is_registrationSafe(){
@@ -407,5 +411,25 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
                 })
                 .show();
 
+    }
+
+    private void initSwitch(){
+        switchButton = (Switch)findViewById(R.id.notify_switch);
+        final LinearLayout noti_select_linear = (LinearLayout)findViewById(R.id.select);
+        switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    switchButton.setText("알람 사용");
+                    noti_select_linear.setEnabled(true);
+                    allow_alarm = true;
+                }
+                else{
+                    switchButton.setText("알람 사용 안함");
+                    noti_select_linear.setEnabled(false);
+                    allow_alarm = false;
+                }
+            }
+        });
     }
 }

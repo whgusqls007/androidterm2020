@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
         else if(WeatherData[0].equals("Snow")) {
             adapter.addItem(ContextCompat.getDrawable(this, R.drawable.snow), "눈이 내림");
         }
-        else if(WeatherData[0].equals("Coulds")) {
+        else if(WeatherData[0].equals("Clouds")) {
             adapter.addItem(ContextCompat.getDrawable(this, R.drawable.cloudy), "흐림");
         }
         else if(WeatherData[0].equals("Clear")) {
