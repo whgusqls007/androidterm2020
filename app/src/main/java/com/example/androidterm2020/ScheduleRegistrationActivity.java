@@ -371,7 +371,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
                 android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
 
         oDialog.setTitle("원하는 주기를 선택하세요")
-                .setItems(oItems, new DialogInterface.OnClickListener()
+                .setSingleChoiceItems(oItems, -1, new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which)
@@ -382,6 +382,12 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
                     }
                 })
                 .setCancelable(false)
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
                 .show();
 
     }
