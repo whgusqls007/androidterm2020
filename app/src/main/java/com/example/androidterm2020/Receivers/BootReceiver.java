@@ -1,9 +1,11 @@
-package com.example.androidterm2020;
+package com.example.androidterm2020.Receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+
+import com.example.androidterm2020.Services.RestartAlarmService;
 
 public class BootReceiver extends BroadcastReceiver {
     @Override

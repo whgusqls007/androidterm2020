@@ -34,9 +34,8 @@ import android.widget.CalendarView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.androidterm2020.API_Task.AirTask;
-import com.example.androidterm2020.API_Task.ReceiveWeatherTask;
-import com.example.androidterm2020.RoomDB.Schedule;
+import com.example.androidterm2020.OPEN_API_Task.AirTask;
+import com.example.androidterm2020.OPEN_API_Task.ReceiveWeatherTask;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 import com.facebook.stetho.Stetho;
 

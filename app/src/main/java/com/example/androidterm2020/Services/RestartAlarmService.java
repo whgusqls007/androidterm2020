@@ -1,4 +1,4 @@
-package com.example.androidterm2020;
+package com.example.androidterm2020.Services;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 
+import com.example.androidterm2020.Receivers.Alarm_Receiver;
 import com.example.androidterm2020.RoomDB.Alarm;
 import com.example.androidterm2020.RoomDB.AlarmViewModel;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;

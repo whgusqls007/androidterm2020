@@ -27,8 +27,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.androidterm2020.Fragments.AchieveListFragment;
 import com.example.androidterm2020.Fragments.DeleteSchedulesFragment;
-import com.example.androidterm2020.FragmentCallback;
 import com.example.androidterm2020.Fragments.ScheduleModificationFragment;
+import com.example.androidterm2020.Receivers.Alarm_Receiver;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;

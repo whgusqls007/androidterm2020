@@ -19,22 +19,25 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity android:name=".Setting"></activity>
-        <activity android:name=".API_Task.AirTask" />
+        <activity android:name=".OPEN_API_Task.AirTask" />
         <activity android:name=".ShowAllSchedule" />
-        <service android:name=".RestartAlarmService"/>
-        <receiver android:name=".BootReceiver"
+        <service android:name=".Services.RestartAlarmService"/>
+        <receiver android:name=".Receivers.BootReceiver"
             android:exported="false"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+        <receiver android:name=".Receivers.RefreshDBReceiver"
+            android:exported="false"
+            android:enabled="true"/>
         <service
             android:name=".GpsTracker"
             android:enabled="true"
             android:exported="true" />
 
-        <receiver android:name=".Alarm_Receiver" />
+        <receiver android:name=".Receivers.Alarm_Receiver" />
         <activity android:name=".ScheduleUpdateActivity" />
         <activity android:name=".ScheduleRegistrationActivity" />
         <activity android:name=".ShowDetail" />

@@ -1,4 +1,4 @@
-package com.example.androidterm2020;
+package com.example.androidterm2020.Receivers;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,8 +13,11 @@ import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
-import com.example.androidterm2020.API_Task.AirTask;
-import com.example.androidterm2020.API_Task.ReceiveWeatherTask;
+import com.example.androidterm2020.OPEN_API_Task.AirTask;
+import com.example.androidterm2020.OPEN_API_Task.ReceiveWeatherTask;
+import com.example.androidterm2020.GpsTracker;
+import com.example.androidterm2020.MainActivity;
+import com.example.androidterm2020.R;
 
 import java.util.concurrent.ExecutionException;
 

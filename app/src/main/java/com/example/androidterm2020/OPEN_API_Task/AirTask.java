@@ -1,4 +1,4 @@
-package com.example.androidterm2020.API_Task;
+package com.example.androidterm2020.OPEN_API_Task;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -14,24 +14,24 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class ReceiveWeatherTask extends AsyncTask<String, Void, String[]> {
-    double lan1, lon1;
-    String[] arr = new String[5];
-    public ReceiveWeatherTask(double lan, double lon){
-        lan1 = lan;
-        lon1 = lon;
-    }
+public class AirTask extends AsyncTask<String, Void, String[]> {
+    String clientKey = "#########################";
     private String str, receiveMsg;
+    private final String ID = "########";
+    String[] arr = new String[2];
     @Override
     protected String[] doInBackground(String... params) {
         URL url = null;
         try {
-            url = new URL("https://api.openweathermap.org/data/2.5/weather?lat="+lan1+"&lon="+lon1+"&units=metric&appid=9a3df66611952a5d90a404ef25a32a15");
+            url = new URL("http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/" +
+                    "getMsrstnAcctoRltmMesureDnsty?stationName=%EB%B6%80%EA%B3%A1%EB%8F%99&dataTerm=month" +
+                    "&pageNo=1&numOfRows=10&ServiceKey=W%2FIZgDCgC%2FSr9cWTAbtUkoV3A%2Bv1Xg2430j86PDLrqR4if7HEI" +
+                    "YcQVGix0dJmMaSGTeuqUxNCeZntb%2Bmeq%2FnMw%3D%3D&ver=1.3&_returnType=json");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
             String clientKey = "#########################";
             conn.setRequestProperty("x-waple-authorization", clientKey);
-            if (conn.getResponseCode() == conn.HTTP_OK) {
+            if (conn.getResponseCode() == conn.HTTP_OK) { // 터지는 라인.
                 InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
                 BufferedReader reader = new BufferedReader(tmp);
                 StringBuffer buffer = new StringBuffer();
@@ -49,31 +49,27 @@ public class ReceiveWeatherTask extends AsyncTask<String, Void, String[]> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String main = "";
-        String description = "";
-        String temp = "";
-        String min = "";
-        String max = "";
+        String pm10Value24 = " ";
+        String pm25Value24 = " ";
         try {
             JSONObject jObject = new JSONObject(receiveMsg);
-            JSONObject jObject2 = jObject.getJSONObject("main");
-            JSONArray jar = new JSONObject(receiveMsg).getJSONArray("weather");
-            temp = jObject2.getString("temp");
-            min = jObject2.getString("temp_min");
-            max = jObject2.getString("temp_max");
-            for(int i=0;i<jar.length();i++){
+            JSONArray jar = jObject.getJSONArray("list");
+            //JSONObject jObject2 = jObject.getJSONObject("list");
+
+            //JSONArray jar = new JSONObject(receiveMsg).getJSONArray("list");
+            for (int i = 0; i < jar.length(); i++) {
                 JSONObject jObject3 = jar.getJSONObject(i);
-                main = jObject3.optString("main");
-                description = jObject3.optString("description");
+                pm10Value24 = jObject3.optString("pm10Value24");
+                pm25Value24 = jObject3.optString("pm25Value24");
+                if (!pm10Value24.equals(" ") || !pm25Value24.equals(" ")) {
+                    arr[0] = pm10Value24;
+                    arr[1] = pm25Value24;
+                    break;
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        arr[0] = main;
-        arr[1] = description;
-        arr[2] = temp;
-        arr[3] = min;
-        arr[4] = max;
         return arr;
     }
 }

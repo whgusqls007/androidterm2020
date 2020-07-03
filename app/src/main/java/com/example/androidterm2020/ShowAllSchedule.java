@@ -23,12 +23,10 @@ import com.example.androidterm2020.Fragments.AchieveAllListFragment;
 import com.example.androidterm2020.Fragments.DeleteAllSchedulesFragment;
 import com.example.androidterm2020.Fragments.DeleteSchedulesFragment;
 import com.example.androidterm2020.Fragments.ScheduleAllModificationFragment;
-import com.example.androidterm2020.RoomDB.Schedule;
+import com.example.androidterm2020.Receivers.Alarm_Receiver;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-
-import java.util.List;
 
 public class ShowAllSchedule extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FragmentCallback {
 
