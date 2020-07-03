@@ -3,12 +3,14 @@ package com.example.androidterm2020.Fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.icu.util.Freezable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -23,6 +25,8 @@ import com.example.androidterm2020.Achieve;
 import com.example.androidterm2020.R;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
+import com.example.androidterm2020.ShowAllSchedule;
+import com.example.androidterm2020.ShowDetail;
 
 import java.util.List;
 
@@ -43,7 +47,7 @@ public class AchieveAllListFragment extends Fragment {
         scrollList = new ScrollView(getContext());
         targetLayout = new LinearLayout(getContext());
         targetLayout.setOrientation(LinearLayout.VERTICAL);
-
+        Bundle bundle = getArguments();
 
         setScheduleViewModel(); // 번들로 가져오자.
         mSchedules = scheduleViewModel.getAllSchedules();
@@ -51,7 +55,6 @@ public class AchieveAllListFragment extends Fragment {
 
         scrollList.addView(targetLayout);
         baseLayout.addView(scrollList);
-
         return rootView;
     }
 
@@ -101,6 +104,16 @@ public class AchieveAllListFragment extends Fragment {
                 Intent intent = new Intent(getContext(), Achieve.class);
                 intent.putExtra("sid", linearLayout.getId());
                 startActivityForResult(intent, 111);
+            }
+        });
+        linearLayout.setOnLongClickListener(new View.OnLongClickListener(){
+            @Override
+            public boolean onLongClick(View v){
+                Toast.makeText(context, "레이아웃 롱클릭", Toast.LENGTH_SHORT).show();
+                final Bundle bundle = new Bundle();
+                bundle.putInt("sid", linearLayout.getId());
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, DeleteAllSchedulesFragment.class, bundle, "delete").commit();
+                return true;
             }
         });
 

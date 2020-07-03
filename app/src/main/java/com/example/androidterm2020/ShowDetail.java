@@ -55,6 +55,7 @@ public class ShowDetail extends AppCompatActivity
     final static int REGISTRATION_REQUEST_CODE = 111;
 
     int count;
+    int LongC;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +81,6 @@ public class ShowDetail extends AppCompatActivity
 
         myToolbar.setTitle("달성도 확인 버튼");
         getSupportFragmentManager().beginTransaction().add(R.id.container, AchieveListFragment.class, bundle).commit();
-
     }
 
     @Override

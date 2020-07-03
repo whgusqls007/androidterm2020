@@ -58,7 +58,7 @@ public class DeleteAllSchedulesFragment extends Fragment {
         scrollList = new ScrollView(getContext());
         targetLayout = new LinearLayout(getContext());
         targetLayout.setOrientation(LinearLayout.VERTICAL);
-
+        Bundle bundle = getArguments();
         setScheduleViewModel(); // 번들로 가져오자.
         mSchedules = scheduleViewModel.getAllSchedules();
         scheduleViewModel.getAllSchedulesObserve().observe(this, new Observer<List<Schedule>>() {
@@ -75,7 +75,6 @@ public class DeleteAllSchedulesFragment extends Fragment {
         if(mSchedules.size() == 0) {
             ((ShowAllSchedule)getActivity()).setFloatingActionButtonImgPlus();
         }
-
         return rootView;
     }
 
