@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.icu.util.Freezable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
@@ -107,12 +109,14 @@ public class AchieveAllListFragment extends Fragment {
             }
         });
         linearLayout.setOnLongClickListener(new View.OnLongClickListener(){
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public boolean onLongClick(View v){
                 Toast.makeText(context, "레이아웃 롱클릭", Toast.LENGTH_SHORT).show();
                 final Bundle bundle = new Bundle();
                 bundle.putInt("sid", linearLayout.getId());
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, DeleteAllSchedulesFragment.class, bundle, "delete").commit();
+                ((ShowAllSchedule)getActivity()).onFragmentSelected(2, bundle);
+                // getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, DeleteAllSchedulesFragment.class, bundle, "delete").commit();
                 return true;
             }
         });

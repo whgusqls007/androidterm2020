@@ -68,6 +68,19 @@ public class DeleteSchedulesFragment extends Fragment {
             ((ShowDetail)getActivity()).setFloatingActionButtonImgPlus();
         }
 
+        int targetId = -1;
+        targetId = getArguments().getInt("sid") > 0 ? getArguments().getInt("sid") : -1;
+
+
+        if(targetId != -1) {
+            for(CheckBox checkBox: checkBoxList) {
+                if(checkBox.getId() == targetId) {
+                    checkBox.setChecked(true);
+                    break;
+                }
+            }
+        }
+
         return rootView;
     }
 
@@ -203,8 +216,6 @@ public class DeleteSchedulesFragment extends Fragment {
     }
 
     public void deleteSchedules() {
-        if(checkedNum <= 0)
-            return;
         for(CheckBox cb : checkBoxList) {
             if(cb.isChecked() == true) {
                 AlarmManager myAlarm = (AlarmManager)getContext().getSystemService(Context.ALARM_SERVICE);
