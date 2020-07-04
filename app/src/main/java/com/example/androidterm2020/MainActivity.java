@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     double longitude;
     String addressString;
     boolean settingInfo;
-    private long backKeyPressedTime = 0;
+
     public static final int REFRESH_DB_CODE = 100000;
 
     String date;
@@ -540,36 +540,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        // 기존 뒤로가기 버튼의 기능을 막기위해 주석처리 또는 삭제
-        // super.onBackPressed();
-
-        // 마지막으로 뒤로가기 버튼을 눌렀던 시간에 2초를 더해 현재시간과 비교 후
-        // 마지막으로 뒤로가기 버튼을 눌렀던 시간이 2초가 지났으면 Toast Show
-        // 2000 milliseconds = 2 seconds
-        if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
-            backKeyPressedTime = System.currentTimeMillis();
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setMessage("정말로 종료하시겠습니까?");
-            builder.setTitle("종료 알림창")
-                    .setCancelable(false)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int i) {
-                            finish();
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int i) {
-                            dialog.cancel();
-                        }
-                    });
-            AlertDialog alert = builder.create();
-            alert.setTitle("종료 알림창");
-            alert.show();
-            return;
-        }
-    }
 }
