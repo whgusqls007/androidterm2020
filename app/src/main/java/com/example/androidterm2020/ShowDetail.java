@@ -97,7 +97,6 @@ public class ShowDetail extends AppCompatActivity
         int id = item.getItemId();
         Bundle bundle = new Bundle();
         bundle.putString("date", date);
-        bundle.putInt("sid", -1);
 
         if(id == R.id.achieveList) {
             Toast.makeText(this, "첫 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
@@ -181,7 +180,6 @@ public class ShowDetail extends AppCompatActivity
                     delFrag.deleteSchedules();
                     Bundle bundle = new Bundle();
                     bundle.putString("date", date);
-                    bundle.putInt("sid", -1);
                     getSupportFragmentManager().beginTransaction().replace(R.id.container, delFrag.getClass(), bundle, delFrag.getTag()).commit();
                 }
                 else {
