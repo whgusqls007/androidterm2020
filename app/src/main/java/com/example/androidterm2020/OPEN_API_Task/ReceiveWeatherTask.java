@@ -28,6 +28,8 @@ public class ReceiveWeatherTask extends AsyncTask<String, Void, String[]> {
         try {
             url = new URL("https://api.openweathermap.org/data/2.5/weather?lat="+lan1+"&lon="+lon1+"&units=metric&appid=9a3df66611952a5d90a404ef25a32a15");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
             String clientKey = "#########################";
             conn.setRequestProperty("x-waple-authorization", clientKey);
@@ -47,7 +49,12 @@ public class ReceiveWeatherTask extends AsyncTask<String, Void, String[]> {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            arr[0] = "none";
+            arr[1] = "none";
+            arr[2] = "none";
+            arr[3] = "none";
+            arr[4] = "none";
+            return arr;
         }
         String main = "";
         String description = "";

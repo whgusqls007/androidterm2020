@@ -12,6 +12,7 @@ import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.androidterm2020.OPEN_API_Task.AirTask;
 import com.example.androidterm2020.OPEN_API_Task.ReceiveWeatherTask;
@@ -92,6 +93,9 @@ public class Alarm_Receiver extends BroadcastReceiver {
         }
         else if((pm25value > 75) || (pm10value > 150)){
             remoteViews.setImageViewResource(R.id.airImg, R.drawable.skull);
+        }
+        else if((pm25value == -1) && (pm10value == -1)){
+            remoteViews.setImageViewResource(R.id.airImg, R.drawable.xxx);
         }
         remoteViews.setTextViewText(R.id.minDegree, Weather[3]);
         remoteViews.setTextViewText(R.id.maxDegree, Weather[4]);

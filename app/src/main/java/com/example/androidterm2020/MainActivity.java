@@ -24,8 +24,10 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
@@ -126,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setListView() {
-        String[] AirData = {"20", "30"};// GetAirData();
+        String[] AirData = GetAirData();//{"20", "30"};// GetAirData();
         String[] WeatherData = GetWeatherData(latitude, longitude);
         int pm25value = Integer.parseInt(!AirData[0].equals("-") ? AirData[0] : "0");
         int pm10value = Integer.parseInt(!AirData[1].equals("-") ? AirData[1] : "0");
@@ -154,6 +156,9 @@ public class MainActivity extends AppCompatActivity {
         else if(WeatherData[0].equals("Drizzle")) {
             adapter.addItem(ContextCompat.getDrawable(this, R.drawable.drizzle_rain), "이슬비");
         }
+        else if(WeatherData[0].equals("none")){
+            adapter.addItem(ContextCompat.getDrawable(this, R.drawable.xxx), "날씨API\n연결 실패");
+        }
         else { // 잘 일어나지 않는 기상사건
             if(WeatherData[0].equals("Thunderstorm") || WeatherData[0].equals("Squall")) {
                 adapter.addItem(ContextCompat.getDrawable(this, R.drawable.thunder_storm), "폭풍");
@@ -175,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        if(pm25value <= 15 || pm10value <= 30){
+        if((pm25value > 0 && pm25value <= 15) || (pm25value > 0 && pm10value <= 30)){
             adapter.addItem(ContextCompat.getDrawable(this, R.drawable.good), "미세먼지 없음");
         }
         else if((pm25value > 15 && pm25value <= 35) || (pm10value > 30 && pm10value < 80)){
@@ -186,6 +191,9 @@ public class MainActivity extends AppCompatActivity {
         }
         else if((pm25value > 75) || (pm10value > 150)){
             adapter.addItem(ContextCompat.getDrawable(this, R.drawable.skull), "미세먼지 매우 나쁨");
+        }
+        else if((pm25value == -1) && (pm10value == -1)){
+            adapter.addItem(ContextCompat.getDrawable(this, R.drawable.xxx), "미세먼지API\n연결 실패");
         }
 
         adapter.addItem("종료");
@@ -470,7 +478,8 @@ public class MainActivity extends AppCompatActivity {
     protected String[] GetAirData() {
         String[] resultText = new String[2];
         try {
-            resultText = new AirTask().execute().get();
+            AirTask task = new AirTask();
+            resultText = task.execute().get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {

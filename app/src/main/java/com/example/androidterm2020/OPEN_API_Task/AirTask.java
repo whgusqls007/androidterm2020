@@ -3,6 +3,8 @@ package com.example.androidterm2020.OPEN_API_Task;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 public class AirTask extends AsyncTask<String, Void, String[]> {
@@ -20,14 +23,17 @@ public class AirTask extends AsyncTask<String, Void, String[]> {
     private final String ID = "########";
     String[] arr = new String[2];
     @Override
-    protected String[] doInBackground(String... params) {
+    protected String[] doInBackground(String... params)
+    {
         URL url = null;
         try {
             url = new URL("http://openapi.airkorea.or.kr/openapi/services/rest/ArpltnInforInqireSvc/" +
                     "getMsrstnAcctoRltmMesureDnsty?stationName=%EB%B6%80%EA%B3%A1%EB%8F%99&dataTerm=month" +
-                    "&pageNo=1&numOfRows=10&ServiceKey=W%2FIZgDCgC%2FSr9cWTAbtUkoV3A%2Bv1Xg2430j86PDLrqR4if7HEI" +
-                    "YcQVGix0dJmMaSGTeuqUxNCeZntb%2Bmeq%2FnMw%3D%3D&ver=1.3&_returnType=json");
+                    "&pageNo=1&numOfRows=10&ServiceKey=7sWWeYO4MfEJPwnU33%2BgPEO8587yFl8rJgID8BsgbSij73COH0j"
+                    +"TvoafHsF5Eo6Os3bdFvX5qba%2BtEjWJVpgYQ%3D%3D&ver=1.3&_returnType=json");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(500);
+            conn.setReadTimeout(500);
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
             String clientKey = "#########################";
             conn.setRequestProperty("x-waple-authorization", clientKey);
@@ -47,7 +53,10 @@ public class AirTask extends AsyncTask<String, Void, String[]> {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            arr[0] = Integer.toString(-1);
+            arr[1] = Integer.toString(-1);
+            return arr;
+            //e.printStackTrace();
         }
         String pm10Value24 = " ";
         String pm25Value24 = " ";
