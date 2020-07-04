@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         setGps();
         setToolbar();
         setCalendar();
-        setListView();
+        setListView(); // 문제의 라인
         RefreshDB();
     }
 
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setListView() {
-        String[] AirData = GetAirData();
+        String[] AirData = {"20", "30"};// GetAirData();
         String[] WeatherData = GetWeatherData(latitude, longitude);
         int pm25value = Integer.parseInt(!AirData[0].equals("-") ? AirData[0] : "0");
         int pm10value = Integer.parseInt(!AirData[1].equals("-") ? AirData[1] : "0");
