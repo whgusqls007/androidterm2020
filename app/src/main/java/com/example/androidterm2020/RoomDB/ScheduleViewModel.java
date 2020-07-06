@@ -159,7 +159,7 @@ public class ScheduleViewModel extends AndroidViewModel {
     }
 
 
-    public class getAllScheduleAsyncTask extends AsyncTask<Void, Void, List<Schedule>> {
+    public static class getAllScheduleAsyncTask extends AsyncTask<Void, Void, List<Schedule>> {
         private ScheduleDao scheduleDao;
 
         public getAllScheduleAsyncTask(ScheduleDao scheduleDao) {
@@ -264,7 +264,7 @@ public class ScheduleViewModel extends AndroidViewModel {
         }
     }
 
-    public class updateScheduleAsyncTask extends AsyncTask<Schedule, Void, Void> {
+    public static class updateScheduleAsyncTask extends AsyncTask<Schedule, Void, Void> {
         private ScheduleDao scheduleDao;
 
         public updateScheduleAsyncTask(ScheduleDao scheduleDao) {
@@ -278,7 +278,7 @@ public class ScheduleViewModel extends AndroidViewModel {
         }
     }
 
-    public class delScheduleByIdAsyncTask extends  AsyncTask<Integer, Void, Void> {
+    public static class delScheduleByIdAsyncTask extends  AsyncTask<Integer, Void, Void> {
         private ScheduleDao scheduleDao;
 
         public delScheduleByIdAsyncTask(ScheduleDao scheduleDao) {

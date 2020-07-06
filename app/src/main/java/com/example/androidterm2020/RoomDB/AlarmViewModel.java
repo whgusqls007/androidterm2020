@@ -116,7 +116,7 @@ public class AlarmViewModel extends AndroidViewModel {
         }
     }
 
-    public class deleteAlarmByScheduleIdAsyncTask extends AsyncTask<Integer, Void, Void> {
+    public static class deleteAlarmByScheduleIdAsyncTask extends AsyncTask<Integer, Void, Void> {
         private AlarmDao alarmDao;
 
         public deleteAlarmByScheduleIdAsyncTask(AlarmDao alarmDao) {
@@ -130,7 +130,7 @@ public class AlarmViewModel extends AndroidViewModel {
         }
     }
 
-    public class getAllAlarmsAsyncTask extends AsyncTask<Void, Void, List<Alarm>> {
+    public static class getAllAlarmsAsyncTask extends AsyncTask<Void, Void, List<Alarm>> {
         private AlarmDao alarmDao;
 
         public getAllAlarmsAsyncTask(AlarmDao alarmDao) {
@@ -139,8 +139,7 @@ public class AlarmViewModel extends AndroidViewModel {
 
         @Override
         protected List<Alarm> doInBackground(Void... voids) {
-            alarmDao.getAllAlarms();
-            return null;
+            return alarmDao.getAllAlarms();
         }
     }
 

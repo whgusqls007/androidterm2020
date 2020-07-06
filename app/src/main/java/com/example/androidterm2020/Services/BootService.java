@@ -30,8 +30,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class BootService extends Service {
-    AlarmViewModel alarmViewModel;
-    ScheduleViewModel scheduleViewModel;
+
     List<Alarm> alarmList;
     List<Schedule> scheduleList;
     RoomDatabase roomDatabase;
@@ -50,7 +49,7 @@ public class BootService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
        // 주 작업. 서비스의 기능.
-        alarmList = alarmViewModel.getAllAlarms();
+
         deleteSchedules(); // 본이 껏다 켜진경우에만 이 서비스가 수행되므로 문제없다.
         updateIndex();
         restartAlarmList();
@@ -118,7 +117,14 @@ public class BootService extends Service {
     }
 
     private int[] getDatetimeData(int scheduleId) {
-        long scheduleStrTimeLong = scheduleViewModel.getScheduleById(scheduleId).getStrDate(); // 202007031510
+        long scheduleStrTimeLong = 0;
+        try {
+            scheduleStrTimeLong = new ScheduleViewModel.getScheduleByIdAsyncTask(roomDatabase.scheduleDao()).execute(scheduleId).get().getStrDate();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } // 202007031510
         String datetime = getDateTime(scheduleStrTimeLong); // 2020-06-23 11:22
                                                             // 0123456789012345
 
@@ -225,11 +231,24 @@ public class BootService extends Service {
 
     private void updateIndex() {
         int index = -1;
-        scheduleList = scheduleViewModel.getAllSchedules();
+        try {
+            scheduleList = new ScheduleViewModel.getAllScheduleAsyncTask(roomDatabase.scheduleDao()).execute().get();
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
         for(Schedule schedule: scheduleList) {
             index = schedule.getIndex()+1;
             schedule.setIndex(index);
-            scheduleViewModel.updateSchedule(schedule);
+            try {
+                new ScheduleViewModel.updateScheduleAsyncTask(roomDatabase.scheduleDao()).execute(schedule).get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -237,11 +256,24 @@ public class BootService extends Service {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm");
         long date = (getLongDate(simpleDateFormat.format(calendar.getTime()))/10000) * 10000;
-        scheduleList = scheduleViewModel.getFromToEndDateSchedules(new long[] {RefreshDBService.START_DATETIME, date}); // 받아옴. 종료일이 오늘보다 이전인것.
+
+        try {
+            scheduleList = new ScheduleViewModel.getFromToEndDateScheduleAsyncTask(roomDatabase.scheduleDao()).execute(RefreshDBService.START_DATETIME, date).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
         for(Schedule schedule: scheduleList) {
-            alarmViewModel.deleteAlarmByScheduleId(schedule.getSid());
-            scheduleViewModel.deleteScheduleById(schedule.getSid());
+            try {
+                new AlarmViewModel.deleteAlarmByScheduleIdAsyncTask(roomDatabase.alarmDao()).execute(schedule.getSid()).get();
+                new ScheduleViewModel.delScheduleByIdAsyncTask(roomDatabase.scheduleDao()).execute(schedule.getSid()).get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 

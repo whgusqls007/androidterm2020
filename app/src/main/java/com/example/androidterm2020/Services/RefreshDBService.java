@@ -10,18 +10,19 @@ import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.example.androidterm2020.RoomDB.Alarm;
 import com.example.androidterm2020.RoomDB.AlarmViewModel;
+import com.example.androidterm2020.RoomDB.RoomDatabase;
+import com.example.androidterm2020.RoomDB.RoomDatabaseAccessor;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class RefreshDBService extends Service {
-    AlarmViewModel alarmViewModel;
-    ScheduleViewModel scheduleViewModel;
     List<Schedule> scheduleList;
-
+    RoomDatabase roomDatabase;
     public static final long START_DATETIME = 1010000;
 
     @Nullable
@@ -33,9 +34,9 @@ public class RefreshDBService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        android.os.Debug.waitForDebugger();
         // 최초의 1회 호출
-        alarmViewModel = new ViewModelProvider((ViewModelStoreOwner) this).get(AlarmViewModel.class);
-        scheduleViewModel = new ViewModelProvider((ViewModelStoreOwner) this).get(ScheduleViewModel.class);
+        roomDatabase = RoomDatabaseAccessor.getInstance(getApplicationContext());
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) { // 매일매일 DB 업데이트
@@ -54,11 +55,23 @@ public class RefreshDBService extends Service {
 
     private void updateIndex() {
         int index = -1;
-        scheduleList = scheduleViewModel.getAllSchedules();
+        try {
+            scheduleList = new ScheduleViewModel.getAllScheduleAsyncTask(roomDatabase.scheduleDao()).execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
         for(Schedule schedule: scheduleList) {
             index = schedule.getIndex()+1;
             schedule.setIndex(index);
-            scheduleViewModel.updateSchedule(schedule);
+            try {
+                new ScheduleViewModel.updateScheduleAsyncTask(roomDatabase.scheduleDao()).execute(schedule).get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -66,11 +79,23 @@ public class RefreshDBService extends Service {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm");
         long date = (getLongDate(simpleDateFormat.format(calendar.getTime()))/10000) * 10000;
-        scheduleList = scheduleViewModel.getFromToEndDateSchedules(new long[] {START_DATETIME, date}); // 받아옴. 종료일이 오늘보다 이전인것.
+        try {
+            scheduleList = new ScheduleViewModel.getFromToEndDateScheduleAsyncTask(roomDatabase.scheduleDao()).execute(RefreshDBService.START_DATETIME, date).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
         for(Schedule schedule: scheduleList) {
-            alarmViewModel.deleteAlarmByScheduleId(schedule.getSid());
-            scheduleViewModel.deleteScheduleById(schedule.getSid());
+            try {
+                new AlarmViewModel.deleteAlarmByScheduleIdAsyncTask(roomDatabase.alarmDao()).execute(schedule.getSid()).get();
+                new ScheduleViewModel.delScheduleByIdAsyncTask(roomDatabase.scheduleDao()).execute(schedule.getSid()).get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 
