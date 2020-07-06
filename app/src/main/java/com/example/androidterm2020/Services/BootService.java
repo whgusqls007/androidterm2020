@@ -18,6 +18,8 @@ import androidx.lifecycle.ViewModelStoreOwner;
 import com.example.androidterm2020.Receivers.Alarm_Receiver;
 import com.example.androidterm2020.RoomDB.Alarm;
 import com.example.androidterm2020.RoomDB.AlarmViewModel;
+import com.example.androidterm2020.RoomDB.RoomDatabase;
+import com.example.androidterm2020.RoomDB.RoomDatabaseAccessor;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 
@@ -25,12 +27,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class BootService extends Service {
     AlarmViewModel alarmViewModel;
     ScheduleViewModel scheduleViewModel;
     List<Alarm> alarmList;
     List<Schedule> scheduleList;
+    RoomDatabase roomDatabase;
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -41,8 +45,7 @@ public class BootService extends Service {
     public void onCreate() {
         super.onCreate();
         // 최초의 1회 호출
-       alarmViewModel = new ViewModelProvider((ViewModelStoreOwner) this).get(AlarmViewModel.class);
-       scheduleViewModel = new ViewModelProvider((ViewModelStoreOwner) this).get(ScheduleViewModel.class);
+        roomDatabase = RoomDatabaseAccessor.getInstance(getApplicationContext());
     }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -104,7 +107,7 @@ public class BootService extends Service {
 
         GregorianCalendar calendar = (GregorianCalendar) GregorianCalendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(start_year, start_month - 1, start_day+1, start_hour, start_min, 0);
+        calendar.set(start_year, start_month - 1, start_day+1, start_hour-2, start_min, 0);
         if (calendar.before(Calendar.getInstance())) {
             calendar.add(GregorianCalendar.YEAR, 1);
             calendar.add(GregorianCalendar.DATE, -1);
@@ -132,7 +135,15 @@ public class BootService extends Service {
     private void restartAlarm(Alarm alarm) {
         Calendar calendar = createCalendar(alarm.getScheduleId());
         int requestCode = alarm.getRequestId();
-        int period = scheduleViewModel.getScheduleById(alarm.getScheduleId()).getPeriod();
+        int period = -1;
+        try {
+            int sid = new AlarmViewModel.getScheduleIdByAlarmIdAsyncTask(roomDatabase.alarmDao()).execute(requestCode).get();
+            period = new ScheduleViewModel.getScheduleByIdAsyncTask(roomDatabase.scheduleDao()).execute(sid).get().getPeriod();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
         // 알람을 등록하는 함수.
         diaryNotification(calendar, requestCode, period);
     }
@@ -140,6 +151,7 @@ public class BootService extends Service {
     @SuppressLint("ShortAlarm")
     void diaryNotification(Calendar calendar, int alarm_requestCode, int period) {
         Intent alarmIntent = new Intent(this, Alarm_Receiver.class);
+        alarmIntent.putExtra("aid", alarm_requestCode);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarm_requestCode, alarmIntent, 0);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         SharedPreferences preference = getPreferences(this);

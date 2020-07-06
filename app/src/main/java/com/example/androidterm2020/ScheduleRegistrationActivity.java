@@ -54,7 +54,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     Button button;
     Button registrationBtn;
     Button selectBtn;
-    int period = -1; // 나중에 checkbox와 연동되도록 코드를 추가해주자.
+    int period = 0; // 나중에 checkbox와 연동되도록 코드를 추가해주자.
     TextView testLog;
     // 달력에서 날짜 누르고 여기 올때 자동으로 날짜 + 시간을 추가해주는 기능.
     String start_date;
@@ -251,7 +251,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             int start_day = Integer.parseInt(scheduleStrDate.getText().toString().substring(8, 10));
             GregorianCalendar calendar = (GregorianCalendar) GregorianCalendar.getInstance();
             calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.set(start_year, start_month - 1, start_day + 1, start_hour - 1, start_min, 0);
+            calendar.set(start_year, start_month - 1, start_day + 1, start_hour - 2, start_min, 0);
             if (calendar.before(Calendar.getInstance())) {
                 calendar.add(GregorianCalendar.YEAR, 1);
                 calendar.add(GregorianCalendar.DATE, -1);
@@ -305,6 +305,7 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     @SuppressLint("ShortAlarm")
     void diaryNotification(Calendar calendar, int alarm_requestCode) {
         Intent alarmIntent = new Intent(this, Alarm_Receiver.class);
+        alarmIntent.putExtra("aid", alarm_requestCode);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarm_requestCode, alarmIntent, 0);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         SharedPreferences preference = getPreferences(this);
@@ -387,12 +388,14 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
     void show()
     {
         final CharSequence[] oItems = {"없음", "매일", "격일", "매주"};
+        int position = period;
+
 
         AlertDialog.Builder oDialog = new AlertDialog.Builder(this,
                 android.R.style.Theme_DeviceDefault_Light_Dialog_Alert);
 
         oDialog.setTitle("원하는 주기를 선택하세요")
-                .setSingleChoiceItems(oItems, -1, new DialogInterface.OnClickListener()
+                .setSingleChoiceItems(oItems, position, new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which)

@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 @Database(entities = {Schedule.class, Alarm.class}, version = 1, exportSchema = false)
 public abstract class RoomDatabase extends androidx.room.RoomDatabase {
     public abstract ScheduleDao scheduleDao();
-    abstract AlarmDao alarmDao();
+    public abstract AlarmDao alarmDao();
 
 //    private static volatile RoomDatabase INSTANCE;
 //    private static final int NUMBER_OF_THREADS = 4;

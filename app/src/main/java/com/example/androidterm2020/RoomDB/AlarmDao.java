@@ -26,6 +26,12 @@ public interface AlarmDao {
     @Query("SELECT aid from alarm_tb ORDER BY aid DESC LIMIT 1")
     int getLastIdAlarm();
 
+    @Query("SELECT scheduleId from alarm_tb WHERE aid = :targetId ORDER BY aid DESC LIMIT 1")
+    int getScheduleIdByAlarmId(int targetId);
+
+    @Query("SELECT * from alarm_tb WHERE aid = :targetId ORDER BY aid DESC LIMIT 1")
+    Alarm getAlarmByAlarmId(int targetId);
+
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertAlarm(Alarm alarm);

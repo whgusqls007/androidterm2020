@@ -250,7 +250,7 @@ public class ScheduleViewModel extends AndroidViewModel {
         }
     }
 
-    public class getScheduleByIdAsyncTask extends  AsyncTask<Integer, Void, Schedule> {
+    public static class getScheduleByIdAsyncTask extends  AsyncTask<Integer, Void, Schedule> {
         private ScheduleDao scheduleDao;
 
         public getScheduleByIdAsyncTask(ScheduleDao scheduleDao) {

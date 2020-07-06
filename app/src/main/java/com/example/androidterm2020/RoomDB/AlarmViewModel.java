@@ -53,6 +53,19 @@ public class AlarmViewModel extends AndroidViewModel {
         return result;
     }
 
+    public int getScheduleIdByAlarmId(int aid) {
+        int result = -1;
+        try {
+            result = new getScheduleIdByAlarmIdAsyncTask(mRoomDatabase.alarmDao()).execute(aid).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
     public Alarm getAlarmByScheduleId(int scheduleId) {
         Alarm result = null;
         try {
@@ -171,6 +184,19 @@ public class AlarmViewModel extends AndroidViewModel {
         protected Void doInBackground(Alarm... alarms) {
             alarmDao.updateAlarm(alarms[0]);
             return null;
+        }
+    }
+
+    public static class getScheduleIdByAlarmIdAsyncTask extends AsyncTask<Integer, Void, Integer> {
+        private AlarmDao alarmDao;
+
+        public getScheduleIdByAlarmIdAsyncTask(AlarmDao alarmDao) {
+            this.alarmDao = alarmDao;
+        }
+
+        @Override
+        protected Integer doInBackground(Integer... integers) {
+            return alarmDao.getScheduleIdByAlarmId(integers[0]);
         }
     }
 }
