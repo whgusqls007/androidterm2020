@@ -18,38 +18,44 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Setting"></activity>
+        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".Setting" />
         <activity android:name=".OPEN_API_Task.AirTask" />
         <activity android:name=".ShowAllSchedule" />
-        <service android:name=".Services.BootService"/>
-        <receiver android:name=".Receivers.BootReceiver"
-            android:exported="false"
-            android:enabled="true">
+
+        <service android:name=".Services.BootService" />
+
+        <receiver
+            android:name=".Receivers.BootReceiver"
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".Receivers.RefreshDBReceiver"
-            android:exported="false"
-            android:enabled="true"/>
+        <receiver
+            android:name=".Receivers.RefreshDBReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
         <service
             android:name=".GpsTracker"
             android:enabled="true"
             android:exported="true" />
 
         <receiver android:name=".Receivers.Alarm_Receiver" />
+
         <activity android:name=".ScheduleUpdateActivity" />
         <activity android:name=".ScheduleRegistrationActivity" />
         <activity android:name=".ShowDetail" />
         <activity android:name=".Achieve" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".Loading">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

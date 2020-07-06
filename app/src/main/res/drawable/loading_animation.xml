@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android">
+    android:oneshot="false">
+    <item android:drawable="@drawable/runclock00" android:duration="50"/>
+    <item android:drawable="@drawable/runclock01" android:duration="50"/>
+    <item android:drawable="@drawable/runclock02" android:duration="50"/>
+    <item android:drawable="@drawable/runclock03" android:duration="50"/>
+    <item android:drawable="@drawable/runclock04" android:duration="50"/>
+    <item android:drawable="@drawable/runclock05" android:duration="50"/>
+    <item android:drawable="@drawable/runclock06" android:duration="50"/>
+    <item android:drawable="@drawable/runclock07" android:duration="50"/>
+    <item android:drawable="@drawable/runclock08" android:duration="50"/>
+    <item android:drawable="@drawable/runclock09" android:duration="50"/>
+    <item android:drawable="@drawable/runclock10" android:duration="50"/>
+    <item android:drawable="@drawable/runclock11" android:duration="50"/>
+    <item android:drawable="@drawable/runclock12" android:duration="50"/>
+    <item android:drawable="@drawable/runclock13" android:duration="50"/>
+    <item android:drawable="@drawable/runclock14" android:duration="50"/>
+    <item android:drawable="@drawable/runclock15" android:duration="50"/>
+    <item android:drawable="@drawable/runclock16" android:duration="50"/>
+    <item android:drawable="@drawable/runclock17" android:duration="50"/>
+</animation-list>
