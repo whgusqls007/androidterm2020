@@ -84,15 +84,15 @@ public class ShowAllSchedule extends AppCompatActivity implements NavigationView
         bundle.putString("date", date);
 
         if(id == R.id.achieveList) {
-            Toast.makeText(this, "첫 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
+            //.makeText(this, "첫 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
             onFragmentSelected(0, bundle);
         }
         else if(id == R.id.scheduleModification) {
-            Toast.makeText(this, "두 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "두 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
             onFragmentSelected(1, bundle);
         }
         else if (id == R.id.deleteSchedules) {
-            Toast.makeText(this, "세 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "세 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
             onFragmentSelected(2, bundle);
         }
 
@@ -156,11 +156,11 @@ public class ShowAllSchedule extends AppCompatActivity implements NavigationView
             public void onClick(View v) {
                 Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
                 if(fragment instanceof DeleteAllSchedulesFragment && ((DeleteAllSchedulesFragment) fragment).getScheduleNum() > 0) {
-                    Toast.makeText(getApplicationContext(), "일정삭제", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "일정삭제", Toast.LENGTH_SHORT).show();
                     ((DeleteAllSchedulesFragment)fragment).deleteSchedules();
                 }
                 else {
-                    Toast.makeText(getApplicationContext(), "일정등록", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "일정등록", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
                     intent.putExtra("date", getIntent().getStringExtra("date"));
                     startActivityForResult(intent, REGISTRATION_REQUEST_CODE); // 화면이 자동으로 갱신되는가?

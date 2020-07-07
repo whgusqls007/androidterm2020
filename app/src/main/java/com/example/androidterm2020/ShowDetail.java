@@ -100,17 +100,17 @@ public class ShowDetail extends AppCompatActivity
         bundle.putInt("sid", -1);
 
         if(id == R.id.achieveList) {
-            Toast.makeText(this, "첫 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
+            //.makeText(this, "첫 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
             onFragmentSelected(0, bundle);
             floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
         }
         else if(id == R.id.scheduleModification) {
-            Toast.makeText(this, "두 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "두 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
             onFragmentSelected(1, bundle);
             floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
         }
         else if (id == R.id.deleteSchedules) {
-            Toast.makeText(this, "세 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
+           //Toast.makeText(this, "세 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
             onFragmentSelected(2, bundle);
             floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.delete));
         }
@@ -176,7 +176,7 @@ public class ShowDetail extends AppCompatActivity
             public void onClick(View v) {
                 Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
                 if(fragment instanceof DeleteSchedulesFragment && ((DeleteSchedulesFragment) fragment).getScheduleNum() > 0) {
-                    Toast.makeText(getApplicationContext(), "일정삭제", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(getApplicationContext(), "일정삭제", Toast.LENGTH_SHORT).show();
                     DeleteSchedulesFragment delFrag = (DeleteSchedulesFragment)getSupportFragmentManager().findFragmentByTag("delete");
                     delFrag.deleteSchedules();
                     Bundle bundle = new Bundle();
@@ -185,7 +185,7 @@ public class ShowDetail extends AppCompatActivity
                     getSupportFragmentManager().beginTransaction().replace(R.id.container, delFrag.getClass(), bundle, delFrag.getTag()).commit();
                 }
                 else {
-                    Toast.makeText(getApplicationContext(), "일정등록", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(getApplicationContext(), "일정등록", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
                     intent.putExtra("date", getIntent().getStringExtra("date"));
                     startActivityForResult(intent, REGISTRATION_REQUEST_CODE); // 화면이 자동으로 갱신되는가?

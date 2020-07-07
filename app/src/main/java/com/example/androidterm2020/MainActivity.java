@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         addressString = getCurrentAddress(latitude, longitude);
 
 
-        Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+        //Toast.makeText(MainActivity.this, "현재위치 \n위도 " + latitude + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
     }
 
     private void setListView() {
@@ -396,7 +396,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
         if (addresses == null || addresses.size() == 0) {
-            Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
             return "주소 미발견";
 
         }
