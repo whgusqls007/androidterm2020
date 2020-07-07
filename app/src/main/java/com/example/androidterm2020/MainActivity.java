@@ -43,6 +43,7 @@ import com.example.androidterm2020.OPEN_API_Task.ReceiveWeatherTask;
 import com.example.androidterm2020.Receivers.Alarm_Receiver;
 import com.example.androidterm2020.Receivers.RefreshDBReceiver;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
+import com.example.androidterm2020.Services.RefreshDBService;
 import com.facebook.stetho.Stetho;
 
 import java.io.IOException;
@@ -517,7 +518,6 @@ public class MainActivity extends AppCompatActivity {
         Calendar calendar = getClearedCalendar();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd hh:mm");
 
-        //reserveRefreshDB(calendar);
         reserveRefreshDB(calendar);
     }
 
@@ -542,9 +542,7 @@ public class MainActivity extends AppCompatActivity {
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC, calendar.getTimeInMillis(), pendingIntent); // 화면을 보여줄 필요는 없어서 WAKE는 안함.
-                    //alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), INTERVAL, pendingIntent); // 다음달 자정에 실행.
-                }else{
-                    //alarmManager.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), INTERVAL, pendingIntent);
+
                 }
             }
         }

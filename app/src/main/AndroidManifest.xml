@@ -24,6 +24,7 @@
         <activity android:name=".ShowAllSchedule" />
 
         <service android:name=".Services.BootService" />
+        <service android:name=".Services.RefreshDBService"/>
 
         <receiver
             android:name=".Receivers.BootReceiver"
