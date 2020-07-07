@@ -2,6 +2,8 @@ package com.example.androidterm2020.Services;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -9,9 +11,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
+import android.widget.Toast;
 
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 
@@ -44,6 +49,15 @@ public class BootService extends Service {
     public void onCreate() {
         super.onCreate();
         // 최초의 1회 호출
+        if(Build.VERSION.SDK_INT >= 26) {
+            Notification notification = new NotificationCompat.Builder(this, "bootService")
+                    .setContentTitle("재부팅")
+                    .setContentText("시스템 재부팅")
+                    .build();
+            startForeground(7, notification);
+        }
+        Log.d("BootService", " 실행됨");
+        Toast.makeText(getApplicationContext(), "BootService 실행됨.", Toast.LENGTH_LONG).show();
         roomDatabase = RoomDatabaseAccessor.getInstance(getApplicationContext());
     }
     @Override
@@ -96,7 +110,7 @@ public class BootService extends Service {
             result += (strDate%10); // 2211
             strDate /= 10;
             if(i%2 == 1 && i < 5) {
-                result += "-";
+                result += "/";
             }
         }
         result = (new StringBuffer(result)).reverse().toString(); //2020/06/23 11:22
@@ -268,7 +282,7 @@ public class BootService extends Service {
 
     private int getRefreshedIndex(Schedule targetSchedule) {
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         long date = (getLongDate(simpleDateFormat.format(calendar.getTime()))/10000) * 10000; // 지금시간 일까지. 그 이하는 치움.
 
         int result = targetSchedule.getIndex();

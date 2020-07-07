@@ -43,6 +43,7 @@ import com.example.androidterm2020.OPEN_API_Task.ReceiveWeatherTask;
 import com.example.androidterm2020.Receivers.Alarm_Receiver;
 import com.example.androidterm2020.Receivers.RefreshDBReceiver;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
+import com.example.androidterm2020.Services.BootService;
 import com.example.androidterm2020.Services.RefreshDBService;
 import com.facebook.stetho.Stetho;
 
@@ -519,6 +520,8 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd hh:mm");
 
         reserveRefreshDB(calendar);
+//        Intent intent = new Intent(getApplicationContext(), BootService.class); // bootService Test용.
+//        startService(intent);
     }
 
     private Calendar getClearedCalendar() {

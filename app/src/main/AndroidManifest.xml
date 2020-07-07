@@ -22,30 +22,6 @@
         <activity android:name=".Setting" />
         <activity android:name=".OPEN_API_Task.AirTask" />
         <activity android:name=".ShowAllSchedule" />
-
-        <service android:name=".Services.BootService" />
-        <service android:name=".Services.RefreshDBService"/>
-
-        <receiver
-            android:name=".Receivers.BootReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".Receivers.RefreshDBReceiver"
-            android:enabled="true"
-            android:exported="false" />
-
-        <service
-            android:name=".GpsTracker"
-            android:enabled="true"
-            android:exported="true" />
-
-        <receiver android:name=".Receivers.Alarm_Receiver" />
-
         <activity android:name=".ScheduleUpdateActivity" />
         <activity android:name=".ScheduleRegistrationActivity" />
         <activity android:name=".ShowDetail" />
@@ -57,6 +33,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name=".Services.BootService" />
+        <service android:name=".Services.RefreshDBService"/>
+        <service
+            android:name=".GpsTracker"
+            android:enabled="true"
+            android:exported="true" />
+        <receiver
+            android:name=".Receivers.BootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".Receivers.RefreshDBReceiver" />
+        <receiver android:name=".Receivers.Alarm_Receiver" />
     </application>
 
 </manifest>
