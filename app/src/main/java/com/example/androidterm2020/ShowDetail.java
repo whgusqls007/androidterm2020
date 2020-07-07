@@ -102,17 +102,14 @@ public class ShowDetail extends AppCompatActivity
         if(id == R.id.achieveList) {
             //.makeText(this, "첫 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
             onFragmentSelected(0, bundle);
-            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
         }
         else if(id == R.id.scheduleModification) {
             //Toast.makeText(this, "두 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
             onFragmentSelected(1, bundle);
-            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
         }
         else if (id == R.id.deleteSchedules) {
            //Toast.makeText(this, "세 번째 메뉴 선택됨.", Toast.LENGTH_LONG).show();
             onFragmentSelected(2, bundle);
-            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.delete));
         }
 
         drawer.closeDrawer(GravityCompat.START);
@@ -128,16 +125,19 @@ public class ShowDetail extends AppCompatActivity
             curFragment = achieveListFragment;
             myToolbar.setTitle("달성도");
             tag = "achieve";
+            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
         }
         else if(position == 1) {
             curFragment = scheduleModificationFragment;
             myToolbar.setTitle("일정 수정");
             tag = "mofify";
+            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
         }
         else if(position == 2) {
             curFragment = deleteSchedulesFragment;
             myToolbar.setTitle("일정 삭제");
             tag = "delete";
+            floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.delete));
         }
 
         getSupportFragmentManager().beginTransaction().replace(R.id.container, curFragment.getClass(), bundle, tag).commit();

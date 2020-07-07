@@ -518,18 +518,15 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd hh:mm");
 
         //reserveRefreshDB(calendar);
-//        Calendar calendar2 = Calendar.getInstance();
-//        calendar.add(Calendar.SECOND, 10);
         reserveRefreshDB(calendar);
     }
 
     private Calendar getClearedCalendar() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR, 0);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0); // 2020-06-20 00:00:00 으로 만드는 것이다.
-
+        calendar.add(Calendar.DATE, 1); // 다음날로 설정
         return calendar;
     }
 
@@ -541,7 +538,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if(alarmManager != null) {
-            long INTERVAL = 1000 * 60 * 60 * 24;
+            //long INTERVAL = 1000 * 60 * 60 * 24;
             if (alarmManager != null) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC, calendar.getTimeInMillis(), pendingIntent); // 화면을 보여줄 필요는 없어서 WAKE는 안함.
