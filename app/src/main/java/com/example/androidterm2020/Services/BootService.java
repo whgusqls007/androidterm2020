@@ -49,13 +49,6 @@ public class BootService extends Service {
     public void onCreate() {
         super.onCreate();
         // 최초의 1회 호출
-        if(Build.VERSION.SDK_INT >= 26) {
-            Notification notification = new NotificationCompat.Builder(this, "bootService")
-                    .setContentTitle("재부팅")
-                    .setContentText("시스템 재부팅")
-                    .build();
-            startForeground(7, notification);
-        }
         Log.d("BootService", " 실행됨");
         Toast.makeText(getApplicationContext(), "BootService 실행됨.", Toast.LENGTH_LONG).show();
         roomDatabase = RoomDatabaseAccessor.getInstance(getApplicationContext());
@@ -68,7 +61,7 @@ public class BootService extends Service {
         updateIndex();
         restartAlarmList(getApplicationContext());
 
-
+        Toast.makeText(getApplicationContext(), "BootService 완료", Toast.LENGTH_LONG).show();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -287,7 +280,7 @@ public class BootService extends Service {
 
         int result = targetSchedule.getIndex();
         int count = 0;
-        // 현재시간이 필요함. 일 이하의 시간은 다 초기화 함.
+        // 현재시간이 필요함. 일 이하의 시간은 다 초기화 함.c
         count = (int)getDaysFromTo(getCalendarDate(targetSchedule.getStrDate()), getCalendarDate(date)); // 값을 얻음. 시작일에서 오늘까지.
         if(count > targetSchedule.getIndex()) { // 인덱스가 오늘을 가르키는지 확인하자. 5/6 시작 index 3-> 5/9일의 index이다. 오늘은 5/11 -> count == 5
             result += (count - targetSchedule.getIndex());
