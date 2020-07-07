@@ -43,7 +43,7 @@ public class RefreshDBReceiver extends BroadcastReceiver {
 
         deleteSchedules(); // 본이 껏다 켜진경우에만 이 서비스가 수행되므로 문제없다, id 삭제하면서 알람도 같이 삭제.
         updateIndex();
-        restartAlarmList(context);
+        // restartAlarmList(context);
 
     }
 

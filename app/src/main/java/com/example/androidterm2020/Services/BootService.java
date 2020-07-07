@@ -52,7 +52,7 @@ public class BootService extends Service {
 
         deleteSchedules(); // 본이 껏다 켜진경우에만 이 서비스가 수행되므로 문제없다.
         updateIndex();
-        restartAlarmList();
+        restartAlarmList(getApplicationContext());
 
 
         return super.onStartCommand(intent, flags, startId);
@@ -64,10 +64,10 @@ public class BootService extends Service {
         // 종료할 때
     }
 
-    private void restartAlarmList() {
+    private void restartAlarmList(Context context) {
         // alarmList에 있는 값을 다시 Alarm으로 등록한다.
         for(Alarm alarm: alarmList) {
-            restartAlarm(alarm);
+            restartAlarm(alarm, context);
         }
     }
 
@@ -138,7 +138,7 @@ public class BootService extends Service {
         return datetimeData;
     }
 
-    private void restartAlarm(Alarm alarm) {
+    private void restartAlarm(Alarm alarm, Context context) {
         Calendar calendar = createCalendar(alarm.getScheduleId());
         int requestCode = alarm.getRequestId();
         int period = -1;
@@ -151,18 +151,18 @@ public class BootService extends Service {
             e.printStackTrace();
         }
         // 알람을 등록하는 함수.
-        diaryNotification(calendar, requestCode, period);
+        diaryNotification(calendar, requestCode, period, context);
     }
 
     @SuppressLint("ShortAlarm")
-    void diaryNotification(Calendar calendar, int alarm_requestCode, int period) {
-        Intent alarmIntent = new Intent(this, Alarm_Receiver.class);
+    void diaryNotification(Calendar calendar, int alarm_requestCode, int period, Context context) {
+        Intent alarmIntent = new Intent(context, Alarm_Receiver.class);
         alarmIntent.putExtra("aid", alarm_requestCode);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, alarm_requestCode, alarmIntent, 0);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        SharedPreferences preference = getPreferences(this);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, alarm_requestCode, alarmIntent, 0);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        SharedPreferences preference = getPreferences(context);
         SharedPreferences.Editor editor = preference.edit();
-        SharedPreferences getprefrence = getPreferences(this);
+        SharedPreferences getprefrence = getPreferences(context);
         while(true) {
             int checkcode = getprefrence.getInt(Integer.toString(alarm_requestCode), -1);
             if(checkcode == -1){

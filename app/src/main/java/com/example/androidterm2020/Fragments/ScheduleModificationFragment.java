@@ -71,7 +71,7 @@ public class ScheduleModificationFragment extends Fragment {
 
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 70, getResources().getDisplayMetrics());
         int endDayWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 120, getResources().getDisplayMetrics());
-        int titleWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 170, getResources().getDisplayMetrics());
+        int titleWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 230, getResources().getDisplayMetrics());
         int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 30, getResources().getDisplayMetrics());
         TextView strTimeView = createTitleTextView(context, "시작시간");
         strTimeView.setLayoutParams(new LinearLayout.LayoutParams(width, height));
@@ -191,7 +191,7 @@ public class ScheduleModificationFragment extends Fragment {
 
     private TextView createTitleTextView(Context context, String title) {
         TextView textView = new TextView(context);
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 170, getResources().getDisplayMetrics());
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 230, getResources().getDisplayMetrics());
         textView.setLayoutParams(new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.WRAP_CONTENT));
         textView.setText(title);
         textView.setGravity(Gravity.CENTER);

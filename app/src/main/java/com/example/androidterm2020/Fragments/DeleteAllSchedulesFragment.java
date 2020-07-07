@@ -111,7 +111,7 @@ public class DeleteAllSchedulesFragment extends Fragment {
 
         int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 33, getResources().getDisplayMetrics());
         int endDayWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 105, getResources().getDisplayMetrics());
-        int titleWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 245, getResources().getDisplayMetrics());
+        int titleWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 280, getResources().getDisplayMetrics());
         int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 30, getResources().getDisplayMetrics());
         TextView cbSpace = new TextView(context);
         cbSpace.setLayoutParams(new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -219,7 +219,7 @@ public class DeleteAllSchedulesFragment extends Fragment {
 
     private TextView createTitleTextView(Context context, String title) {
         TextView textView = new TextView(context);
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 246, getResources().getDisplayMetrics());
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 280, getResources().getDisplayMetrics());
         textView.setLayoutParams(new LinearLayout.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
         textView.setText(title);
         textView.setGravity(Gravity.CENTER_HORIZONTAL);

@@ -512,15 +512,15 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
+
     private void RefreshDB() { // DB에서 이미 종료일이 오늘보다 빠른 경우 지우고, 있는 친구들은 index를 증가시키는 걸 해야함.
         Calendar calendar = getClearedCalendar();
-
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy:MM:dd hh:mm");
 
         //reserveRefreshDB(calendar);
-        Calendar calendar2 = Calendar.getInstance();
-        calendar.add(Calendar.SECOND, 10);
-        reserveRefreshDB(calendar2);
+//        Calendar calendar2 = Calendar.getInstance();
+//        calendar.add(Calendar.SECOND, 10);
+        reserveRefreshDB(calendar);
     }
 
     private Calendar getClearedCalendar() {

@@ -1,6 +1,5 @@
 package com.example.androidterm2020.Receivers;
 
-import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -8,23 +7,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.example.androidterm2020.OPEN_API_Task.AirTask;
 import com.example.androidterm2020.OPEN_API_Task.ReceiveWeatherTask;
 import com.example.androidterm2020.GpsTracker;
 import com.example.androidterm2020.MainActivity;
 import com.example.androidterm2020.R;
-import com.example.androidterm2020.RoomDB.Alarm;
 import com.example.androidterm2020.RoomDB.AlarmViewModel;
 import com.example.androidterm2020.RoomDB.RoomDatabase;
 import com.example.androidterm2020.RoomDB.RoomDatabaseAccessor;
@@ -35,7 +28,7 @@ import java.util.concurrent.ExecutionException;
 
 public class Alarm_Receiver extends BroadcastReceiver {
     GpsTracker gpsTracker;
-    String[] Weather = new String[5];
+    String[] WeatherData = new String[5];
     String[] Air = new String[2];
     Alarm_Receiver context = this;
     AlarmViewModel alarmViewModel;
@@ -46,28 +39,28 @@ public class Alarm_Receiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         // 날씨가 마스크 알림에 덮혀 씹힌다. 2개의 알림을 동시에 볼 수 있게 해야함.
         roomDatabase = RoomDatabaseAccessor.getInstance(context);
-
-        NotifyWeather(context, getTargetTitle(intent));
+        Schedule schedule = getTargetSchedule(intent);
+        NotifyWeather(context, schedule.getTitle(), getTime(schedule.getStrDate()));
         //NotifyMask(context);
         //showCustomLayoutNotification(context);
     }
 
-    private String getTargetTitle(Intent intent) {
+    private Schedule getTargetSchedule(Intent intent) {
         int aid = intent.getIntExtra("aid", 0);
-        String title = "";
+        Schedule result = null;
         try {
             int sid = new AlarmViewModel.getScheduleIdByAlarmIdAsyncTask(roomDatabase.alarmDao()).execute(aid).get();
-            title = new ScheduleViewModel.getScheduleByIdAsyncTask(roomDatabase.scheduleDao()).execute(sid).get().getTitle();
+            result = new ScheduleViewModel.getScheduleByIdAsyncTask(roomDatabase.scheduleDao()).execute(sid).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
 
-        return title;
+        return result;
     }
 
-    protected void NotifyWeather(Context context, String title) {
+    protected void NotifyWeather(Context context, String title, String time) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         Intent notificationIntent = new Intent(context, MainActivity.class);
 
@@ -105,7 +98,7 @@ public class Alarm_Receiver extends BroadcastReceiver {
         gpsTracker = new GpsTracker(context);
         double lan = gpsTracker.getLatitude();
         double lon = gpsTracker.getLongitude();
-        Weather = GetWeatherData(lan, lon);
+        WeatherData = GetWeatherData(lan, lon);
         Air = GetAirData();
 
         int pm25value = Integer.parseInt(Air[0]);
@@ -113,8 +106,46 @@ public class Alarm_Receiver extends BroadcastReceiver {
 
         // 레이아웃의 값을 설정한다.
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.app_notification);
+        remoteViews.setTextViewText(R.id.scheduleTime, time); // 실험 대상.
         remoteViews.setTextViewText(R.id.ScheduleTitle, title); // 실험 대상.
         remoteViews.setImageViewResource(R.id.weatherImg, R.drawable.sunnny); // 강우확률에 따라서 이미지를 바꿀 필요가 있다.
+        if(WeatherData[0].equals("Rain")) {
+            remoteViews.setImageViewResource(R.id.weatherImg,  R.drawable.rainy);
+        }
+        else if(WeatherData[0].equals("Snow")) {
+            remoteViews.setImageViewResource(R.id.weatherImg, R.drawable.snow);
+        }
+        else if(WeatherData[0].equals("Clouds")) {
+            remoteViews.setImageViewResource(R.id.weatherImg, R.drawable.cloudy);
+        }
+        else if(WeatherData[0].equals("Clear")) {
+            remoteViews.setImageViewResource(R.id.weatherImg, R.drawable.sunnny);
+        }
+        else if(WeatherData[0].equals("Drizzle")) {
+            remoteViews.setImageViewResource(R.id.weatherImg, R.drawable.drizzle_rain);
+        }
+        else if(WeatherData[0].equals("none")){
+            remoteViews.setImageViewResource(R.id.weatherImg, R.drawable.xxx);
+        }
+        else { // 잘 일어나지 않는 기상사건
+            if(WeatherData[0].equals("Thunderstorm") || WeatherData[0].equals("Squall")) {
+                remoteViews.setImageViewResource(R.id.weatherImg, R.drawable.thunder_storm);
+            }
+            else if(WeatherData[0].equals("Mist")
+                    || WeatherData[0].equals("Fog")
+                    || WeatherData[0].equals("Haze")) { // 안개
+                remoteViews.setImageViewResource(R.id.weatherImg, R.drawable.fog);
+            }
+            else if(WeatherData[0].equals("Dust") || WeatherData[0].equals("Sand")) { // 먼지
+                remoteViews.setImageViewResource(R.id.weatherImg, R.drawable.dust);
+            }
+            else if(WeatherData[0].equals("Smoke")) { // 연기
+                remoteViews.setImageViewResource(R.id.weatherImg, R.drawable.smog);
+            }
+            else { // 나머지는 치명적임. 아마 목숨이 위험할 듯. 화산재, 토네이도 이런 부류...
+                remoteViews.setImageViewResource(R.id.weatherImg, R.drawable.skull);
+            }
+        }
         if(pm25value <= 15 || pm10value <= 30){ // 코드를 깔끔하게 만들 필요가 있다.
             remoteViews.setImageViewResource(R.id.airImg, R.drawable.good);
         }
@@ -130,8 +161,8 @@ public class Alarm_Receiver extends BroadcastReceiver {
         else if((pm25value == -1) && (pm10value == -1)){
             remoteViews.setImageViewResource(R.id.airImg, R.drawable.xxx);
         }
-        remoteViews.setTextViewText(R.id.minDegree, Weather[3]);
-        remoteViews.setTextViewText(R.id.maxDegree, Weather[4]);
+        remoteViews.setTextViewText(R.id.minDegree, WeatherData[3]);
+        remoteViews.setTextViewText(R.id.maxDegree, WeatherData[4]);
         remoteViews.setTextViewText(R.id.pm25, Air[0]);
         remoteViews.setTextViewText(R.id.pm10, Air[1]);
         builder.setAutoCancel(true)
@@ -173,6 +204,20 @@ public class Alarm_Receiver extends BroadcastReceiver {
 
     }
 
+    private String getTime(long strDate) { // 20200623 1122 에서 1122만 가져온다.
+        String result = "";
+
+        for(int i=0; i<4; ++i) {
+            result += (strDate%10); // 2211
+            strDate /= 10;
+            if(i == 1) {
+                result += ":";
+            }
+        }
+        result = (new StringBuffer(result)).reverse().toString(); // 11:22
+
+        return result;
+    }
 
 }
 /*public class Alarm_Receiver extends BroadcastReceiver {
