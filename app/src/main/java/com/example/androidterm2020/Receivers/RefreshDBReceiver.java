@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.ViewModel;
@@ -23,6 +24,7 @@ import com.example.androidterm2020.RoomDB.RoomDatabase;
 import com.example.androidterm2020.RoomDB.RoomDatabaseAccessor;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
+import com.example.androidterm2020.Services.BootService;
 import com.example.androidterm2020.Services.RefreshDBService;
 
 import java.text.SimpleDateFormat;
@@ -40,6 +42,12 @@ public class RefreshDBReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Intent RefreshDBServiceIntent = new Intent(context, RefreshDBService.class);
         roomDatabase = RoomDatabaseAccessor.getInstance(context);
-        context.startService(RefreshDBServiceIntent);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Toast.makeText(context, "BootService 시작", Toast.LENGTH_LONG).show();
+            context.startForegroundService(RefreshDBServiceIntent); // Android 8 이상부터
+        }
+        else {
+            context.startService(RefreshDBServiceIntent);
+        }
     }
 }
