@@ -40,12 +40,6 @@ public class RefreshDBReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Intent RefreshDBServiceIntent = new Intent(context, RefreshDBService.class);
         roomDatabase = RoomDatabaseAccessor.getInstance(context);
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // 매일 자정이 지나면 작업.
-            context.startForegroundService(RefreshDBServiceIntent); // Android 8 이상부터
-        }
-        else {
-            context.startService(RefreshDBServiceIntent);
-        }
+        context.startService(RefreshDBServiceIntent);
     }
 }
