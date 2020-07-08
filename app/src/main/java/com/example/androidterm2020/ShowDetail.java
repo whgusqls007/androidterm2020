@@ -15,7 +15,6 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -52,10 +51,11 @@ public class ShowDetail extends AppCompatActivity
     String date;
     FloatingActionButton floatingActionButton;
 
-    final static int REGISTRATION_REQUEST_CODE = 111;
+    public final static int FRAGMENT_REFRESH_CODE = 30000;
 
     int count;
     int LongC;
+    int currentPosition;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,18 +126,21 @@ public class ShowDetail extends AppCompatActivity
             myToolbar.setTitle("달성도");
             tag = "achieve";
             floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
+            currentPosition = 0;
         }
         else if(position == 1) {
             curFragment = scheduleModificationFragment;
             myToolbar.setTitle("일정 수정");
             tag = "mofify";
             floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.plus));
+            currentPosition = 1;
         }
         else if(position == 2) {
             curFragment = deleteSchedulesFragment;
             myToolbar.setTitle("일정 삭제");
             tag = "delete";
             floatingActionButton.setImageDrawable(getResources().getDrawable(R.drawable.delete));
+            currentPosition = 2;
         }
 
         getSupportFragmentManager().beginTransaction().replace(R.id.container, curFragment.getClass(), bundle, tag).commit();
@@ -153,13 +156,9 @@ public class ShowDetail extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REGISTRATION_REQUEST_CODE) {
-            //해당 fragement의 화면 초기화.
-            Bundle bundle = new Bundle();
-            bundle.putString("date", date);
-            Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment.getClass(), bundle, fragment.getTag()).commit(); // 프래그먼트 재시작.
-        }
+        Bundle bundle = new Bundle();
+        bundle.putString("date", date);
+        onFragmentSelected(resultCode, bundle); // 프래그먼트 재시작.
     }
 
     private void initViews() {
@@ -188,7 +187,8 @@ public class ShowDetail extends AppCompatActivity
                    // Toast.makeText(getApplicationContext(), "일정등록", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(getApplicationContext(), ScheduleRegistrationActivity.class);
                     intent.putExtra("date", getIntent().getStringExtra("date"));
-                    startActivityForResult(intent, REGISTRATION_REQUEST_CODE); // 화면이 자동으로 갱신되는가?
+                    intent.putExtra("position", currentPosition);
+                    startActivityForResult(intent, FRAGMENT_REFRESH_CODE); // 화면이 자동으로 갱신되는가?
                 }
             }
         });

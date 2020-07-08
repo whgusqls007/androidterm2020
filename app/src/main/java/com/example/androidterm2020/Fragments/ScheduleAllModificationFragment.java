@@ -23,6 +23,7 @@ import com.example.androidterm2020.RoomDB.AlarmViewModel;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 import com.example.androidterm2020.ScheduleUpdateActivity;
+import com.example.androidterm2020.ShowAllSchedule;
 
 import java.util.List;
 
@@ -110,7 +111,7 @@ public class ScheduleAllModificationFragment extends Fragment {
                 Toast.makeText(context, "수정창으로 갑니다.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getContext(), ScheduleUpdateActivity.class);
                 intent.putExtra("sid", linearLayout.getId());
-                startActivityForResult(intent, 111);
+                startActivityForResult(intent, ShowAllSchedule.FRAGMENT_REFRESH_CODE);
             }
         });
 

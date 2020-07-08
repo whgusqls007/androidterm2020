@@ -104,8 +104,8 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
 
                 if(is_registrationSafe()){
                     int id = insertSchedule();
-
-                    //registerAlarm( "schAlarm", queryData);
+                    Intent finishIntent = new Intent();
+                    setResult(getIntent().getIntExtra("position", 0), finishIntent);
                     finish();
                 }
                 else{
@@ -145,14 +145,25 @@ public class ScheduleRegistrationActivity extends AppCompatActivity {
             }
         };
 
-        final TextView end_Date = (TextView) findViewById(R.id.editScheduleEndDate);
-        end_Date.setOnClickListener(new View.OnClickListener() {
+        scheduleStrDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new DatePickerDialog(ScheduleRegistrationActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        end_Date.setText(year + "-" + ((month+1) > 9 ? "" : "0")+ (month+1) + "-" + ((dayOfMonth) > 9 ? "" : "0")+ dayOfMonth);
+                        scheduleStrDate.setText(year + "-" + ((month+1) > 9 ? "" : "0")+ (month+1) + "-" + ((dayOfMonth) > 9 ? "" : "0")+ dayOfMonth);
+                    }
+                }, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
+        scheduleEndDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(ScheduleRegistrationActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        scheduleEndDate.setText(year + "-" + ((month+1) > 9 ? "" : "0")+ (month+1) + "-" + ((dayOfMonth) > 9 ? "" : "0")+ dayOfMonth);
                     }
                 }, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }

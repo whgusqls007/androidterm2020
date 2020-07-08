@@ -3,6 +3,7 @@ package com.example.androidterm2020.Fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -25,6 +27,7 @@ import com.example.androidterm2020.RoomDB.RoomDatabaseAccessor;
 import com.example.androidterm2020.RoomDB.Schedule;
 import com.example.androidterm2020.RoomDB.ScheduleViewModel;
 import com.example.androidterm2020.ScheduleUpdateActivity;
+import com.example.androidterm2020.ShowDetail;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -108,12 +111,13 @@ public class ScheduleModificationFragment extends Fragment {
         linearLayout.addView(endTimeTextView);
         linearLayout.addView(titleTextView); // View를 단위 레이아웃에 넣는다.
         linearLayout.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 Toast.makeText(context, "수정창으로 갑니다.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getContext(), ScheduleUpdateActivity.class);
                 intent.putExtra("sid", linearLayout.getId());
-                startActivityForResult(intent, 111);
+                startActivityForResult(intent, ShowDetail.FRAGMENT_REFRESH_CODE);
             }
         });
 

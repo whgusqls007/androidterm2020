@@ -1,17 +1,21 @@
 package com.example.androidterm2020;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
@@ -36,13 +40,15 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
     TextView testLog;
     Schedule schedule;
 
+    static final int TARGET_FRAGMENT_INDEX = 1;
+
     private ScheduleViewModel scheduleViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.schedule_registeration_activity);
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
         final int ID = intent.getIntExtra("sid", 0);
 
         Button regBtn = (Button) findViewById(R.id.regBtn);
@@ -57,6 +63,41 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
         details = (EditText) findViewById(R.id.editDetails);
         toolbarTitle = (TextView)findViewById(R.id.toolbar_title);
         toolbarTitle.setText("일정 수정");
+
+        final Calendar myCalendar = Calendar.getInstance();
+
+        DatePickerDialog.OnDateSetListener myDatePicker = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, month);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            }
+        };
+
+        scheduleStrDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(ScheduleUpdateActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        scheduleStrDate.setText(year + "-" + ((month+1) > 9 ? "" : "0")+ (month+1) + "-" + ((dayOfMonth) > 9 ? "" : "0")+ dayOfMonth);
+                    }
+                }, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
+        scheduleEndDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(ScheduleUpdateActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        scheduleEndDate.setText(year + "-" + ((month+1) > 9 ? "" : "0")+ (month+1) + "-" + ((dayOfMonth) > 9 ? "" : "0")+ dayOfMonth);
+                    }
+                }, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
 
         scheduleStrTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,10 +153,13 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
 
         Button updateBtn = (Button) findViewById(R.id.regBtn);
         updateBtn.setOnClickListener(new View.OnClickListener() { // update버튼.
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
                 // 업데이트 쿼리문.
                 updateSchedule();
+                Intent finishIntent = new Intent();
+                setResult(TARGET_FRAGMENT_INDEX, finishIntent);
                 finish();
             }
         });
@@ -141,20 +185,47 @@ public class ScheduleUpdateActivity extends AppCompatActivity {
         String data = "";
         if(schedule.getAchievementData().length() < newDateNum) { // 날의 일 수 가 증가하면
             // 1. 시작날짜 그대로일 경우
-            // 2. 시작일이 변한경우
-            data = schedule.getAchievementData();
             int dateNum = schedule.getDateNum();
             if(schedule.getStrDate() == getLongDate(scheduleStrDate.getText().toString() + " " + scheduleStrTime.getText().toString())) { // 시작일 그대로면 바로 뒤에 0을 추가함 증가한 만큼 111 -> 111000
+                data = schedule.getAchievementData();
                 for (int i = 0; i < (newDateNum-dateNum); ++i) {
                     data += "0";
                 }
             }
-            else { // 초기화 하고 DateNum 만큼 만들어준다.
+            else { // 2. 시작일이 변한경우 초기화 하고 DateNum 만큼 만들어준다.
                 data = "0";
                 for (int i = 0; i < newDateNum -1; ++i) {
                     data += "0";
                 }
             }
+        }
+        else if(schedule.getAchievementData().length() < newDateNum) { // 일수가 같고
+            // 시작일이 같거나 -> 기존 값 그대로 적용
+            int dateNum = schedule.getDateNum();
+            if(schedule.getStrDate() == getLongDate(scheduleStrDate.getText().toString() + " " + scheduleStrTime.getText().toString())) { // 그대로 사용함.
+                data = schedule.getAchievementData();
+            }
+            else { // 초기화 하고 DateNum 만큼 만들어준다.  시작일이 다르거나 -> 의미가 없으므로 초기화함.
+                data = "0";
+                for (int i = 0; i < newDateNum -1; ++i) {
+                    data += "0";
+                }
+            }
+        }
+        else { // 일수가 줄어듬.
+            // 시작일이 같거나 -> 잘라서 그것만 돌려줌.
+            // 시작일이 같거나 -> 기존 값 그대로 적용
+            int dateNum = schedule.getDateNum();
+            if(schedule.getStrDate() == getLongDate(scheduleStrDate.getText().toString() + " " + scheduleStrTime.getText().toString())) { // 시작일이 같음
+                data = schedule.getAchievementData().substring(0, newDateNum); // 012345 0123
+            }
+            else { // 초기화 하고 DateNum 만큼 만들어준다.  시작일이 다르거나 -> 의미가 없으므로 초기화함.
+                data = "0";
+                for (int i = 0; i < newDateNum -1; ++i) {
+                    data += "0";
+                }
+            }
+            // 시작일이 다르거나 -> 의미가 없으므로 초기화함.
         }
 
         return data;
